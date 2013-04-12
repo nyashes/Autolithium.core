@@ -160,8 +160,8 @@ namespace Autolithium.core
                     {
                         throw new AutoitException(AutoitExceptionType.LEXER_BADFORMAT, LineNumber, Cursor);
                     }
-                    AutoItVarCompiler.Createvar(szTemp);
-                    return null;
+                    //AutoItVarCompiler.Createvar(szTemp);
+                    //return null;
                     if (TryParseSubscript(out Ret))
                     {
                         return Expression.ArrayIndex(Expression.Parameter(typeof(object[]), szTemp), Ret);
@@ -453,30 +453,17 @@ namespace Autolithium.core
                         if (Peek() == ">")
                         {
                             Consume();
-                            if (C1.NodeType == ExpressionType.Parameter && C1.Type != typeof(string))
-                            {
-                                List<Expression> Sync = new List<Expression>();
-                                C2 = ParseConcat();
-                                C1 = AutoItVarCompiler.Access((C1 as ParameterExpression).Name, VarSynchronisation, C2.Type);
-                            }
-                            else C2 = ParseConcat();
+                            C2 = ParseConcat();
                             C1 = Expression.NotEqual(C1, C2);
 
                         }
-                        else // Must be numeric
+                        else if (Peek() == "=")
                         {
-                            if (C1.NodeType == ExpressionType.Parameter)
-                            {
-                                List<Expression> Sync = new List<Expression>();
-                                C1 = AutoItVarCompiler.Access((C1 as ParameterExpression).Name, VarSynchronisation, typeof(double), typeof(int), typeof(long));
-                            }
-                            if (Peek() == "=")
-                            {
-                                Consume();
-                                C1 = Expression.LessThanOrEqual(C1, ParseConcat());
-                            }
-                            else C1 = Expression.LessThan(C1, ParseConcat());
+                            Consume();
+                            C1 = Expression.LessThanOrEqual(C1, ParseConcat());
                         }
+                        else C1 = Expression.LessThan(C1, ParseConcat());
+                        
                         continue;
                     case '>':
                         if (Peek() == "=")
@@ -489,7 +476,8 @@ namespace Autolithium.core
                     case '=':
                         if (Peek() == "=")
                         {
-                                C1 = Expression.ReferenceEqual(C1, ParseConcat());
+                            C2 = ParseConcat();
+                            C1 = Expression.AndAlso(Expression.TypeEqual(C1, C2.Type), Expression.Equal(C1, C2));
                         }
                         else if (ExpectAssign)
                         {
@@ -515,7 +503,7 @@ namespace Autolithium.core
             ConsumeWS();
             Expression C1;
             char ch;
-            C1 = ParseRelationnal(ExpectAssign, typeof(bool));
+            C1 = ParseRelationnal(ExpectAssign);
             do
             {
                 ConsumeWS();
@@ -525,14 +513,14 @@ namespace Autolithium.core
                     case 'A': if (Peek(3).ToUpper() == "ND ")
                         {
                             Consume(3);
-                            C1 = Expression.AndAlso(C1, ParseRelationnal(ExpectAssign, typeof(bool)));
+                            C1 = Expression.AndAlso(C1, ParseRelationnal(ExpectAssign));
                         }
                         else break;
                         continue;
                     case 'O': if (Peek(2).ToUpper() == "R ")
                         {
                             Consume(2);
-                            C1 = Expression.OrElse(C1, ParseRelationnal(ExpectAssign, typeof(bool)));
+                            C1 = Expression.OrElse(C1, ParseRelationnal(ExpectAssign));
                         }
                         else break;
                         continue;

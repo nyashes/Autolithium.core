@@ -54,15 +54,48 @@ namespace Autolithium.core
             else
             {
                 Sync.Add(
-                    Expression.Assign(PolymorphList[desired],
+                    Expression.Assign(PolymorphList[ActualType.First(x => desired.Contains(x))],
                         Expression.Convert(
                             Expression.Call(
                                 typeof(Convert).GetRuntimeMethod("ChangeType", new Type[] { typeof(object), typeof(Type), typeof(IFormatProvider) }),
                                 PolymorphList[ActualType[0]],
                                 Expression.Constant(desired, typeof(Type)),
                                 Expression.Constant(CultureInfo.InvariantCulture, typeof(IFormatProvider))),
-                            desired)));
-                return PolymorphList[desired];
+                            ActualType.First(x => desired.Contains(x)))));
+                return PolymorphList[ActualType.First(x => desired.Contains(x))];
+            }
+        }
+    }
+    public static class ExpressionExtension
+    {
+        public Expression GetOfType(this Expression value, List<Expression> Sync, params Type[] desired)
+        {
+            switch (value.NodeType)
+            {
+                case ExpressionType.Constant:
+                    var val = value as ConstantExpression;
+                    if (desired.Contains(val.Type)) return val;
+                    else
+                    {
+                        if (val.Type == typeof(double) || val.Type == typeof(long) || val.Type == typeof(int) || val.Type == typeof(bool))
+                        {
+                            if (desired.Contains(typeof(double))) return Expression.Constant((double)val.Value, typeof(double));
+                            else if (desired.Contains(typeof(long))) return Expression.Constant((long)val.Value, typeof(long));
+                            else if (desired.Contains(typeof(int))) return Expression.Constant((int)val.Value, typeof(int));
+                            else if (desired.Contains(typeof(bool))) return Expression.Constant((dynamic)val.Value > 0, typeof(bool));
+                            else return Expression.Constant(Convert.ToString(val.Value, CultureInfo.InvariantCulture), typeof(string));
+                        }
+                        else if (val.Type == typeof(string))
+                        {
+                            return Expression.Constant(Convert.ChangeType(val.Value, desired.First()), desired.First());
+                        }
+                        else return val;
+                    }
+                case ExpressionType.Parameter:
+                    var val2 = value as ParameterExpression;
+                    return AutoItVarCompiler.Access(val2.Name, Sync, desired);
+                default:
+                    return value;
             }
         }
     }
