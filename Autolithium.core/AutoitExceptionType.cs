@@ -20,6 +20,7 @@ namespace Autolithium.core
         UNASSIGNEDVARIABLE,
         MISSINGVAR,
         EXITLLOOPOUTSIDELOOP,
+        FORWITHOUTTO,
     }
     public static class AutoitErrorMSG
     {
@@ -53,6 +54,8 @@ namespace Autolithium.core
                     return "AutoItVarCompiler: The variable \"{2}\" does not exists";
                 case AutoitExceptionType.EXITLLOOPOUTSIDELOOP:
                     return "({0}, {1}) You try to exit or continue a loop outside a loop";
+                case AutoitExceptionType.FORWITHOUTTO:
+                    return "({0}, {1}) A for loop must be 'for $var = first_value to last_value [step number_to_add]'";
             }
             return "Error in the error : this error is unknown :'(";
         }
