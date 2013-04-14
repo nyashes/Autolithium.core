@@ -23,12 +23,18 @@ namespace Autolithium.compiler
                 "Autolithium-" + new Random().Next(int.MaxValue),
                 MethodAttributes.Public | MethodAttributes.Static);
             LiParser.Parse(
-@"$i = 0
+@"$i = 1
 $t = TimerInit()
-while $i < 100000
-$i = $i + 1
-Wend
-ConsoleWriteError(TimerDiff($t))
+while $i < 10000
+	$j = 2
+	while $j < $i
+		if int($i / $j) = $i / $j then ExitLoop
+		$j += 1
+	WEnd
+	if $j >= $i then ConsoleWriteerror($i)
+	$i += 2
+WEnd
+ConsoleWriteerror(TimerDiff($t))
 "
                 ).CompileToMethod(method);
             dt.CreateType();

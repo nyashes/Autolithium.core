@@ -23,5 +23,9 @@ namespace Autolithium.core
         {
             return (DateTime.Now - DateTime.MinValue).TotalSeconds - Data;
         }
+        public static long INT(double n1)
+        {
+            return (long)n1;
+        }
     }
 }

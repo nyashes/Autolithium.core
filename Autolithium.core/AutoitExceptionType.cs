@@ -19,6 +19,7 @@ namespace Autolithium.core
         ASSIGNTONOTVARIABLE,
         UNASSIGNEDVARIABLE,
         MISSINGVAR,
+        EXITLLOOPOUTSIDELOOP,
     }
     public static class AutoitErrorMSG
     {
@@ -50,6 +51,8 @@ namespace Autolithium.core
                     return "AutoItVarCompiler: The variable \"{2}\" is used before being assigned";
                 case AutoitExceptionType.MISSINGVAR:
                     return "AutoItVarCompiler: The variable \"{2}\" does not exists";
+                case AutoitExceptionType.EXITLLOOPOUTSIDELOOP:
+                    return "({0}, {1}) You try to exit or continue a loop outside a loop";
             }
             return "Error in the error : this error is unknown :'(";
         }
