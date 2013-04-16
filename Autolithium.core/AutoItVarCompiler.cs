@@ -17,6 +17,7 @@ namespace Autolithium.core
         public Dictionary<Type, ParameterExpression> PolymorphList = new Dictionary<Type, ParameterExpression>();
         public List<Type> ActualType = new List<Type>();
         public Expression ArrayIndex;
+        public Type MyType;
         public string MyName;
 
         public static KeyValuePair<string, Type[]>[] Save()
@@ -60,8 +61,15 @@ namespace Autolithium.core
         }
         public Expression Assign(Expression e)
         {
+            if (this.MyName.EndsWith("[]"))
+            {
+
+                return Expression.Assign(Expression.ArrayAccess(PolymorphList.First().Value, ArrayIndex), 
+                    Expression.Convert(e, typeof(object)));
+            }
             if (!PolymorphList.ContainsKey(e.Type)) 
                 PolymorphList.Add(e.Type, Expression.Parameter(e.Type, this.MyName));
+
             ActualType.Clear();
             ActualType.Add(e.Type);
             if (e.NodeType == ExpressionType.Add)
@@ -78,6 +86,26 @@ namespace Autolithium.core
         public Expression Access(List<Expression> Sync, params Type[] desired)
         {
             Sync = Sync ?? new List<Expression>();
+            if (this.MyName.EndsWith("[]"))
+            {
+                Expression Ret = PolymorphList.First().Value;
+                if (ArrayIndex != null) Ret = Expression.ArrayAccess(Ret, ArrayIndex.GetOfType(Sync, typeof(int)));
+                if (MyType != null) Ret = Expression.Convert(Ret, MyType);
+                if (MyType != null && desired.First() != MyType) //We should convert it correctly
+                {
+                    if (ExpressionExtension.Numeric.Contains(MyType)
+                    && desired.Any(x => ExpressionExtension.Numeric.Contains(x))) // number to number, do it fast
+                    {
+                        return Expression.Convert(Ret,
+                            ExpressionExtension.LargestNumeric(desired));
+                    }
+                    else //Long way
+                        return GenericConvert(Ret, desired.First());
+                }
+                else if (desired.First() != MyType) Ret = GenericConvert(Ret, desired.First()); //Arbitrary and blind choice
+                return Ret;
+
+            }
             if (ActualType.Any(x => desired.Contains(x))) return PolymorphList[ActualType.First(x => desired.Contains(x))];
             else if (ActualType.Count <= 0)
                 throw new AutoitException(AutoitExceptionType.UNASSIGNEDVARIABLE, 0, 0, MyName);
@@ -92,13 +120,7 @@ namespace Autolithium.core
                 }
                 else Sync.Add(
                     Expression.Assign(PolymorphList[desired.First()],
-                        Expression.Convert(
-                            Expression.Call(
-                                typeof(Convert).GetRuntimeMethod("ChangeType", new Type[] { typeof(object), typeof(Type), typeof(IFormatProvider) }),
-                                Expression.Convert(PolymorphList[ActualType[0]], typeof(object)),
-                                Expression.Constant(desired.First(), typeof(Type)),
-                                Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo)),
-                            desired.First())));
+                        GenericConvert(PolymorphList[ActualType[0]], desired.First())));
                 ActualType.Add(desired.First());
                 return PolymorphList[desired.First()];
             }
@@ -110,9 +132,31 @@ namespace Autolithium.core
                 return this.PolymorphList[this.ActualType.First()];
             }
         }
-        public AutoItVarCompiler Clone()
+        public static Expression GenericConvert(Expression e, Type Destination)
         {
-            return (AutoItVarCompiler)this.MemberwiseClone();
+            if (Destination == typeof(bool)) return
+                Expression.GreaterThan(GenericConvert(e, typeof(double)), Expression.Constant(0, typeof(double)));
+            else if (Destination == typeof(string)) return
+                Expression.Call(
+                                typeof(Convert).GetRuntimeMethod("ToString", new Type[] { e.Type, typeof(IFormatProvider) }),
+                                e,
+                                Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo));
+            else return Expression.Convert(
+                            Expression.Call(
+                                typeof(Convert).GetRuntimeMethod("ChangeType", new Type[] { typeof(object), typeof(Type), typeof(IFormatProvider) }),
+                                Expression.Convert(e, typeof(object)),
+                                Expression.Constant(Destination, typeof(Type)),
+                                Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo)),
+                            Destination);
+        }
+        public static Expression DynamicUnbox(Expression e)
+        {
+            return Expression.Call(DynamicUnboxInfo, e);
+        }
+        public static readonly MethodInfo DynamicUnboxInfo = typeof(AutoItVarCompiler).GetRuntimeMethod("Unbox", new Type[] { typeof(object) });
+        public static dynamic Unbox(object e)
+        {
+            return (dynamic)e;
         }
     }
     public static class ExpressionExtension
@@ -120,8 +164,11 @@ namespace Autolithium.core
         public static readonly Type[] Numeric = new Type[] { typeof(int), typeof(long), typeof(double) };
         public static Expression GetOfType(this Expression value, List<Expression> Sync, params Type[] desired)
         {
-            if (desired.Contains(typeof(object))) return Expression.Convert(value, typeof(object));
-            if (desired.Contains(value.Type)) return value;
+            if (!(value is ParameterExpression) || !(value as ParameterExpression).Name.EndsWith("[]"))
+            {
+                if (desired.Contains(typeof(object))) return Expression.Convert(value, typeof(object));
+                if (desired.Contains(value.Type)) return value;
+            }
             switch (value.NodeType)
             {
                 case ExpressionType.Constant:
@@ -178,6 +225,5 @@ namespace Autolithium.core
             if (t.Contains(typeof(int))) return typeof(int);
             else return t.First();
         }
-
     }
 }

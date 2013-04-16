@@ -9,7 +9,7 @@ namespace Autolithium.core
 {
     public static class Autcorlib
     {
-        public static AutoItWeakObject CONSOLEWRITEERROR(object Data)
+        public static int CONSOLEWRITEERROR(object Data)
         {
             var str = Data.ToString();
             Debug.WriteLine(str);
@@ -25,9 +25,9 @@ namespace Autolithium.core
         public static double ACOS(double n) { return Math.Acos(n); }
         public static double ASIN(double n) { return Math.Asin(n); }
         public static double ATAN(double n) { return Math.Atan(n); }
-        public static double COS(double n) { return Math.Cos(n); }
-        public static double SIN(double n) { return Math.Sin(n); }
-        public static double TAN(double n) { return Math.Tan(n); }
+        public static double COS (double n) { return Math.Cos(n); }
+        public static double SIN (double n) { return Math.Sin(n); }
+        public static double TAN (double n) { return Math.Tan(n); }
         #endregion
         #region Time management
         public static DateTime TIMERINIT()

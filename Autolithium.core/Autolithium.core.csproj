@@ -34,6 +34,13 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Compile Include="LiParser\1 - LiParser.ParseBoolean.cs" />
+    <Compile Include="LiParser\5 - LiParser.ParseMultiplicative.cs" />
+    <Compile Include="LiParser\3 - LiParser.ParseConcat.cs" />
+    <Compile Include="LiParser\2 - LiParser.ParseRelationnal.cs" />
+    <Compile Include="LiParser\4 - LiParser.ParseAdditive.cs" />
+    <Compile Include="LiParser\6 - LiParser.ParseExponent.cs" />
+    <Compile Include="LiParser\8 - LiParser.ParsePrimary.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autcorlib.cs" />
@@ -41,9 +48,16 @@
     <Compile Include="AutoitExceptionType.cs" />
     <Compile Include="AutoItVarCompiler.cs" />
     <Compile Include="BasicMacro.cs" />
-    <Compile Include="LiParser.cs" />
+    <Compile Include="LiParser\Keywords\FUNCTIONCALL.cs" />
+    <Compile Include="LiParser\Keywords\FOR.cs" />
+    <Compile Include="LiParser\Keywords\WHILE.cs" />
+    <Compile Include="LiParser\Keywords\IF.cs" />
+    <Compile Include="LiParser\LiParser.cs" />
+    <Compile Include="LiParser\LiParser.KeyWordsAndFuncs.cs" />
+    <Compile Include="LiParser\LiParser.LexHelpers.cs" />
+    <Compile Include="LiParser\7 - LiParser.ParseUnary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WeakTyper.cs" />
+    <None Include="WeakTyper.cs.old" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.core", "Autolithium.core\Autolithium.core.csproj", "{6FFE8048-3F6B-47E5-834B-23DF43713E1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.test", "Autolithium.test\Autolithium.test.csproj", "{2B7019A0-F2C2-46E4-9206-449A8D3F2C57}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.compiler", "Autolithium.compiler\Autolithium.compiler.csproj", "{9EFCBC67-EF50-47D8-847B-7FDA842AFCF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.ion", "Autolithium.ion\Autolithium.ion.csproj", "{39E08B52-0B1D-45E9-97B6-DE4A727CF280}"
@@ -31,10 +29,6 @@ Global
 		{6FFE8048-3F6B-47E5-834B-23DF43713E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FFE8048-3F6B-47E5-834B-23DF43713E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FFE8048-3F6B-47E5-834B-23DF43713E1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2B7019A0-F2C2-46E4-9206-449A8D3F2C57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2B7019A0-F2C2-46E4-9206-449A8D3F2C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2B7019A0-F2C2-46E4-9206-449A8D3F2C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2B7019A0-F2C2-46E4-9206-449A8D3F2C57}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9EFCBC67-EF50-47D8-847B-7FDA842AFCF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9EFCBC67-EF50-47D8-847B-7FDA842AFCF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EFCBC67-EF50-47D8-847B-7FDA842AFCF4}.Release|Any CPU.ActiveCfg = Release|Any CPU

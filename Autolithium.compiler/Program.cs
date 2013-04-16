@@ -23,13 +23,16 @@ namespace Autolithium.compiler
                 "Autolithium-" + new Random().Next(int.MaxValue),
                 MethodAttributes.Public | MethodAttributes.Static);
             LiParser.Parse(
-@"$t = TimerInit()
-for $i = 1 to 10000 step 2
-	for $j = 2 to $i
-		if int($i / $j) = $i / $j then ExitLoop
-	next
-	if $j >= $i then ConsoleWriteerror($i)
-next
+@"$a[2]
+$a[0] = 1
+$a[1] = ''
+$t = TimerInit()
+while $a[0] < 10000
+$a[0] +=1
+sin($a[0])
+$a[1] = $a[1] & ' ' & $a[0] ; ==> objArray[0] = ((string) objArray[1]) + ' ' + Convert.ToString((int) objArray[0], CultureInfo.InvariantCulture); fix it
+wend
+ConsoleWriteerror($a[1])
 ConsoleWriteerror(TimerDiff($t))
 "
                 /**/
