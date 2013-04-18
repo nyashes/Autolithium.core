@@ -24,8 +24,8 @@ namespace Autolithium.core
                     case '^':
                         C2 = ParseUnary();
                         C1 = Expression.Power(
-                            C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                            C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                            C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                            C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         continue;
 
                 }

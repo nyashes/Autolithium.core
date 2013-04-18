@@ -9,62 +9,67 @@ using System.Globalization;
 
 namespace Autolithium.core
 {
-    public class AutoItVarCompiler
+    public class AutoItVarCompilerEngine
     {
-        public static readonly MemberInfo InvariantCultureInfo = typeof(CultureInfo).GetRuntimeProperty("InvariantCulture");
-
-        public static Dictionary<string, AutoItVarCompiler> Get = new Dictionary<string,AutoItVarCompiler>();
-        public Dictionary<Type, ParameterExpression> PolymorphList = new Dictionary<Type, ParameterExpression>();
-        public List<Type> ActualType = new List<Type>();
-        public Expression ArrayIndex;
-        public Type MyType;
-        public string MyName;
-
-        public static KeyValuePair<string, Type[]>[] Save()
+        public Dictionary<string, AutoItVarCompiler> Get = new Dictionary<string, AutoItVarCompiler>();
+        public KeyValuePair<string, Type[]>[] Save()
         {
             return Get.Select(x => new KeyValuePair<string, Type[]>(x.Key, x.Value.ActualType.ToArray())).ToArray();
         }
-        public static void Restore(KeyValuePair<string, Type[]>[] d, List<Expression> Sync)
+        public void Restore(KeyValuePair<string, Type[]>[] d, List<Expression> Sync)
         {
             foreach (var e in d)
                 if (e.Value.Any(x => !Get[e.Key].ActualType.Contains(x)))
                     foreach (var i in e.Value.Where(x => !Get[e.Key].ActualType.Contains(x)))
                         Access(e.Key, Sync, i);
         }
-
-        public static AutoItVarCompiler Createvar(string Name, Expression index = null)
+        public AutoItVarCompiler Createvar(string Name)
         {
             Get.Add(Name, new AutoItVarCompiler()
             {
                 MyName = Name,
-                ArrayIndex = index
             });
             return Get[Name];
 
         }
-        public static Expression Assign(string Name, Expression e)
+        public Expression Assign(string Name, Expression e)
         {
             if (Get.ContainsKey(Name)) return Get[Name].Assign(e);
             else return Createvar(Name).Assign(e);
         }
-        public static Expression Access(string Name, List<Expression> Sync, params Type[] desired)
+        public Expression Access(string Name, List<Expression> Sync, params Type[] desired)
         {
             if (Get.ContainsKey(Name)) return Get[Name].Access(Sync, desired);
             else throw new AutoitException(AutoitExceptionType.MISSINGVAR, 0, 0, Name);
         }
-        public static ParameterExpression[] DefinedVars
+        public ParameterExpression[] DefinedVars
         {
             get
             {
                 return Get.SelectMany(x => x.Value.PolymorphList.Select(y => y.Value)).ToArray();
             }
         }
+    }
+    public class AutoItVarCompiler
+    {
+        public static readonly MemberInfo InvariantCultureInfo = typeof(CultureInfo).GetRuntimeProperty("InvariantCulture");
+
+        
+        public Dictionary<Type, ParameterExpression> PolymorphList = new Dictionary<Type, ParameterExpression>();
+        public List<Type> ActualType = new List<Type>();
+        public Stack<Expression> ArrayIndex = new Stack<Expression>();
+        public Stack<Type> MyType = new Stack<Type>();
+        public string MyName;
+        public AutoItVarCompilerEngine Parent;
+        
+
+        
         public Expression Assign(Expression e)
         {
             if (this.MyName.EndsWith("[]"))
             {
 
-                return Expression.Assign(Expression.ArrayAccess(PolymorphList.First().Value, ArrayIndex), 
+                return Expression.Assign(Expression.ArrayAccess(PolymorphList.First().Value, ArrayIndex.Pop()), 
                     Expression.Convert(e, typeof(object)));
             }
             if (!PolymorphList.ContainsKey(e.Type)) 
@@ -88,12 +93,14 @@ namespace Autolithium.core
             Sync = Sync ?? new List<Expression>();
             if (this.MyName.EndsWith("[]"))
             {
+                var T = MyType.Pop();
+                var Index = ArrayIndex.Pop();
                 Expression Ret = PolymorphList.First().Value;
-                if (ArrayIndex != null) Ret = Expression.ArrayAccess(Ret, ArrayIndex.GetOfType(Sync, typeof(int)));
-                if (MyType != null) Ret = Expression.Convert(Ret, MyType);
-                if (MyType != null && desired.First() != MyType) //We should convert it correctly
+                if (Index != null) Ret = Expression.ArrayAccess(Ret, Index.GetOfType(Parent, Sync, typeof(int)));
+                if (T != null) Ret = Expression.Convert(Ret, T);
+                if (T != null && desired.First() != T) //We should convert it correctly
                 {
-                    if (ExpressionExtension.Numeric.Contains(MyType)
+                    if (ExpressionExtension.Numeric.Contains(T)
                     && desired.Any(x => ExpressionExtension.Numeric.Contains(x))) // number to number, do it fast
                     {
                         return Expression.Convert(Ret,
@@ -102,7 +109,7 @@ namespace Autolithium.core
                     else //Long way
                         return GenericConvert(Ret, desired.First());
                 }
-                else if (desired.First() != MyType) Ret = GenericConvert(Ret, desired.First()); //Arbitrary and blind choice
+                else if (desired.First() != T) Ret = GenericConvert(Ret, desired.First()); //Arbitrary and blind choice
                 return Ret;
 
             }
@@ -134,6 +141,8 @@ namespace Autolithium.core
         }
         public static Expression GenericConvert(Expression e, Type Destination)
         {
+            if (Destination == typeof(object)) return
+                Expression.Convert(e, typeof(object));
             if (Destination == typeof(bool)) return
                 Expression.GreaterThan(GenericConvert(e, typeof(double)), Expression.Constant(0, typeof(double)));
             else if (Destination == typeof(string)) return
@@ -162,7 +171,7 @@ namespace Autolithium.core
     public static class ExpressionExtension
     {
         public static readonly Type[] Numeric = new Type[] { typeof(int), typeof(long), typeof(double) };
-        public static Expression GetOfType(this Expression value, List<Expression> Sync, params Type[] desired)
+        public static Expression GetOfType(this Expression value, AutoItVarCompilerEngine e, List<Expression> Sync, params Type[] desired)
         {
             if (!(value is ParameterExpression) || !(value as ParameterExpression).Name.EndsWith("[]"))
             {
@@ -192,7 +201,7 @@ namespace Autolithium.core
                     }
                 case ExpressionType.Parameter:
                     var val2 = value as ParameterExpression;
-                    return AutoItVarCompiler.Access(val2.Name, Sync, desired);
+                    return e.Access(val2.Name, Sync, desired);
                 case ExpressionType.Call:
                     if (ExpressionExtension.Numeric.Contains(value.Type)
                     && desired.Any(x => ExpressionExtension.Numeric.Contains(x)))

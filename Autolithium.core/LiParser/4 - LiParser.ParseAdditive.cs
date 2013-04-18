@@ -25,15 +25,15 @@ namespace Autolithium.core
                         if (Peek() == "=") break;
                         C2 = ParseMultiplicative();
                         C1 = Expression.Add(
-                            C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                            C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                            C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                            C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         continue;
                     case '-':
                         if (Peek() == "=") break;
                         C2 = ParseMultiplicative();
                         C1 = Expression.Subtract(
-                            C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                            C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                            C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                            C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         continue;
                 }
                 SeekRelative(-1);

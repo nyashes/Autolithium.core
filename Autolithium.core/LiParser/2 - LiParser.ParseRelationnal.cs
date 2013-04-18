@@ -25,7 +25,7 @@ namespace Autolithium.core
                         if (Peek() == ">")
                         {
                             Consume();
-                            C2 = ParseConcat().GetOfType(VarSynchronisation, C1.Type);
+                            C2 = ParseConcat().GetOfType(VarCompilerEngine, VarSynchronisation, C1.Type);
                             C1 = Expression.NotEqual(C1, C2);
 
                         }
@@ -34,15 +34,15 @@ namespace Autolithium.core
                             Consume();
                             C2 = ParseConcat();
                             C1 = Expression.LessThanOrEqual(
-                                C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         }
                         else
                         {
                             C2 = ParseConcat();
                             C1 = Expression.LessThan(
-                                C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         }
 
                         continue;
@@ -52,15 +52,15 @@ namespace Autolithium.core
                             Consume();
                             C2 = ParseConcat();
                             C1 = Expression.GreaterThanOrEqual(
-                                C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         }
                         else
                         {
                             C2 = ParseConcat();
                             C1 = Expression.GreaterThan(
-                                C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         }
                         continue;
                     case '=':
@@ -76,7 +76,7 @@ namespace Autolithium.core
                             {
                                 Consume();
                                 var value = ParseBoolean(false);
-                                C1 = AutoItVarCompiler.Assign((C1 as ParameterExpression).Name, value);
+                                C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name, value);
 
                             }
                             else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
@@ -85,8 +85,8 @@ namespace Autolithium.core
                         {
                             C2 = ParseConcat();
                             C1 = Expression.Equal(
-                                C1.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         }
                         continue;
                     case '+':
@@ -94,12 +94,15 @@ namespace Autolithium.core
                         Consume();
                         if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
                         {
+                            if ((C1 as ParameterExpression).Name.EndsWith("[]"))
+                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
+                                    VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
                             ConsumeWS();
                             C2 = ParseBoolean(false);
-                            C1 = AutoItVarCompiler.Assign((C1 as ParameterExpression).Name,
+                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
                                 Expression.Add(
-                                    AutoItVarCompiler.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                    C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
+                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
 
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
@@ -109,12 +112,15 @@ namespace Autolithium.core
                         Consume();
                         if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
                         {
-                            Consume();
+                            if ((C1 as ParameterExpression).Name.EndsWith("[]"))
+                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
+                                    VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
+                            ConsumeWS();
                             C2 = ParseBoolean(false);
-                            C1 = AutoItVarCompiler.Assign((C1 as ParameterExpression).Name,
+                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
                                 Expression.Subtract(
-                                    AutoItVarCompiler.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                    C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
+                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
 
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
@@ -124,27 +130,33 @@ namespace Autolithium.core
                         Consume();
                         if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
                         {
-                            Consume();
+                            if ((C1 as ParameterExpression).Name.EndsWith("[]"))
+                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
+                                    VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
+                            ConsumeWS();
                             C2 = ParseBoolean(false);
-                            C1 = AutoItVarCompiler.Assign((C1 as ParameterExpression).Name,
+                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
                                 Expression.Multiply(
-                                    AutoItVarCompiler.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                    C2.GetOfType(VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
+                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
+                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
 
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
                         continue;
                     case '/':
                         if (Peek() != "=" || !ExpectAssign) break;
-                        Consume();
+                        if ((C1 as ParameterExpression).Name.EndsWith("[]"))
+                            VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
+                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
+                        ConsumeWS();
                         if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
                         {
                             Consume();
                             C2 = ParseBoolean(false);
-                            C1 = AutoItVarCompiler.Assign((C1 as ParameterExpression).Name,
+                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
                                 Expression.Divide(
-                                    AutoItVarCompiler.Access((C1 as ParameterExpression).Name, VarSynchronisation, typeof(double)),
-                                    C2.GetOfType(VarSynchronisation, typeof(double))));
+                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, typeof(double)),
+                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(double))));
 
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());

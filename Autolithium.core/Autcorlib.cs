@@ -16,10 +16,7 @@ namespace Autolithium.core
             return str.Length;
         }
         
-        public static long INT(double n1)
-        {
-            return (long)n1;
-        }
+        public static int INT(double n1){return (int)n1;}
 
         #region Trigonometric functions
         public static double ACOS(double n) { return Math.Acos(n); }
@@ -28,6 +25,18 @@ namespace Autolithium.core
         public static double COS (double n) { return Math.Cos(n); }
         public static double SIN (double n) { return Math.Sin(n); }
         public static double TAN (double n) { return Math.Tan(n); }
+        public static double ACOS(long n) { return Math.Acos(n); }
+        public static double ASIN(long n) { return Math.Asin(n); }
+        public static double ATAN(long n) { return Math.Atan(n); }
+        public static double COS (long n) { return Math.Cos(n); }
+        public static double SIN (long n) { return Math.Sin(n); }
+        public static double TAN (long n) { return Math.Tan(n); }
+        public static double ACOS(int n) { return Math.Acos(n); }
+        public static double ASIN(int n) { return Math.Asin(n); }
+        public static double ATAN(int n) { return Math.Atan(n); }
+        public static double COS (int n) { return Math.Cos(n); }
+        public static double SIN (int n) { return Math.Sin(n); }
+        public static double TAN (int n) { return Math.Tan(n); }
         #endregion
         #region Time management
         public static DateTime TIMERINIT()

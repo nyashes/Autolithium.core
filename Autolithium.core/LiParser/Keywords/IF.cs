@@ -11,7 +11,7 @@ namespace Autolithium.core
     {
         private Expression ParseKeyword_IF(string Keyword)
         {
-            var Element = ParseBoolean(false).GetOfType(VarSynchronisation, typeof(bool));
+            var Element = ParseBoolean(false).GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool));
             ConsumeWS();
             if (Peek(4).ToUpper() == "THEN")
             {

@@ -38,27 +38,28 @@ namespace Autolithium.core
                     if (TryParseSubscript(out Ret))
                     {
                         szTemp += "[]";
-                        if (!AutoItVarCompiler.Get.ContainsKey(szTemp))
+                        if (!VarCompilerEngine.Get.ContainsKey(szTemp))
                         {
-                            var a = AutoItVarCompiler.Createvar(szTemp, Ret);
+                            var a = VarCompilerEngine.Createvar(szTemp);
+                            VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
                             a.ActualType.Add(typeof(object[]));
                             a.PolymorphList.Add(typeof(object[]), ParameterExpression.Parameter(typeof(object[]), szTemp));
-                            return Expression.Assign(AutoItVarCompiler.Get[szTemp].ActualValue,
+                            return Expression.Assign(VarCompilerEngine.Get[szTemp].ActualValue,
                                 Expression.NewArrayBounds(typeof(object), Ret));
                         }
-                        AutoItVarCompiler.Get[szTemp].ArrayIndex = Ret;
+                        VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
                         Type t;
                         if (TryParseCast(out t))
-                            AutoItVarCompiler.Get[szTemp].MyType = t;
-                        else AutoItVarCompiler.Get[szTemp].MyType = null;
+                            VarCompilerEngine.Get[szTemp].MyType.Push(t);
+                        else VarCompilerEngine.Get[szTemp].MyType.Push(null);
                         return Expression.Parameter(typeof(object[]), szTemp);
                     }
-                    if (!AutoItVarCompiler.Get.ContainsKey(szTemp))
+                    if (!VarCompilerEngine.Get.ContainsKey(szTemp))
                     {
-                        AutoItVarCompiler.Createvar(szTemp);
+                        VarCompilerEngine.Createvar(szTemp);
                         return Expression.Parameter(typeof(object), szTemp);
                     }
-                    else return AutoItVarCompiler.Get[szTemp].ActualValue;
+                    else return VarCompilerEngine.Get[szTemp].ActualValue;
 
                 case '@':
                     szTemp = Getstr(Reg_AlphaNum);

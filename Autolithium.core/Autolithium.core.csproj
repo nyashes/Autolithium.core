@@ -48,6 +48,8 @@
     <Compile Include="AutoitExceptionType.cs" />
     <Compile Include="AutoItVarCompiler.cs" />
     <Compile Include="BasicMacro.cs" />
+    <Compile Include="LiParser\Keywords\RETURN.cs" />
+    <Compile Include="LiParser\Keywords\FUNCTIONDEF.cs" />
     <Compile Include="LiParser\Keywords\FUNCTIONCALL.cs" />
     <Compile Include="LiParser\Keywords\FOR.cs" />
     <Compile Include="LiParser\Keywords\WHILE.cs" />

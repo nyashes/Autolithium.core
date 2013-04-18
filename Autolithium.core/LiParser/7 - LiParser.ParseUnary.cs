@@ -19,11 +19,11 @@ namespace Autolithium.core
                 case '+':
                     return ParsePrimary();
                 case '-':
-                    return Expression.Negate(ParsePrimary().GetOfType(VarSynchronisation, ExpressionExtension.Numeric));
+                    return Expression.Negate(ParsePrimary().GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.Numeric));
                 case 'N': if (Peek(3).ToUpper() == "OT ")
                     {
                         Consume(3);
-                        return Expression.Not(ParsePrimary().GetOfType(VarSynchronisation, typeof(bool)));
+                        return Expression.Not(ParsePrimary().GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool)));
                     }
                     break;
             }

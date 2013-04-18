@@ -21,6 +21,7 @@ namespace Autolithium.core
         MISSINGVAR,
         EXITLLOOPOUTSIDELOOP,
         FORWITHOUTTO,
+        NOFUNCMATCH,
     }
     public static class AutoitErrorMSG
     {
@@ -56,6 +57,8 @@ namespace Autolithium.core
                     return "({0}, {1}) You try to exit or continue a loop outside a loop";
                 case AutoitExceptionType.FORWITHOUTTO:
                     return "({0}, {1}) A for loop must be 'for $var = first_value to last_value [step number_to_add]'";
+                case AutoitExceptionType.NOFUNCMATCH:
+                    return "({0}, {1}) There is no function to match {2}";
             }
             return "Error in the error : this error is unknown :'(";
         }

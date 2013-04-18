@@ -22,6 +22,7 @@ namespace Autolithium.core
                 case "IF": return ParseKeyword_IF(Keyword);
                 case "WHILE": return ParseKeyword_WHILE(Keyword);
                 case "FOR": return ParseKeyword_FOR(Keyword);
+                case "RETURN": return ParseKeyword_RETURN(Keyword);
                 case "ENDIF":
                 case "NEXT":
                 case "END":
@@ -48,7 +49,7 @@ namespace Autolithium.core
         {
             Expression Element;
             List<Expression> Instruction = new List<Expression>();
-            var Dump = AutoItVarCompiler.Save();
+            var Dump = VarCompilerEngine.Save();
             do
             {
                 NextLine();
@@ -60,7 +61,7 @@ namespace Autolithium.core
             while (Element != null);
             if (IsLoop)
             {
-                AutoItVarCompiler.Restore(Dump, VarSynchronisation);
+                VarCompilerEngine.Restore(Dump, VarSynchronisation);
                 if (VarSynchronisation.Count > 0) Instruction.AddRange(VarSynchronisation);
                 VarSynchronisation.Clear();
                 Seek();
