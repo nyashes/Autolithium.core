@@ -1,0 +1,19 @@
+﻿$a[2]
+$a[0] = 1
+$a[1] = ''
+$t = TimerInit()
+while $a[0]::int < 10000
+	$a[0]::int +=1
+	sin($a[0]::int)
+	$a[1] = $a[1]::string & ' ' & $a[0]::int
+wend
+alert(TimerDiff($t))
+alert(lol())
+alert(plop())
+alert(plop($t))
+func lol()
+	return plop('kikoo')
+endfunc
+func plop($test = 46546)
+	return 'plop ' & $test
+endfunc

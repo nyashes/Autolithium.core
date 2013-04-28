@@ -203,6 +203,7 @@ namespace Autolithium.core
                     var val2 = value as ParameterExpression;
                     return e.Access(val2.Name, Sync, desired);
                 case ExpressionType.Call:
+                case ExpressionType.Invoke:
                     if (ExpressionExtension.Numeric.Contains(value.Type)
                     && desired.Any(x => ExpressionExtension.Numeric.Contains(x)))
                     {

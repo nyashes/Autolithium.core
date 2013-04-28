@@ -48,6 +48,7 @@
     <Compile Include="AutoitExceptionType.cs" />
     <Compile Include="AutoItVarCompiler.cs" />
     <Compile Include="BasicMacro.cs" />
+    <Compile Include="LiParser\Keywords\DO.cs" />
     <Compile Include="LiParser\Keywords\RETURN.cs" />
     <Compile Include="LiParser\Keywords\FUNCTIONDEF.cs" />
     <Compile Include="LiParser\Keywords\FUNCTIONCALL.cs" />

@@ -7,17 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.compiler", "Aut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.ion", "Autolithium.ion\Autolithium.ion.csproj", "{39E08B52-0B1D-45E9-97B6-DE4A727CF280}"
 EndProject
-Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "dyn", "Autolithium.compiler\bin\Debug\dyn.exe", "{14F48E5A-75E9-4044-8596-F2F19936356B}"
-	ProjectSection(DebuggerProjectSystem) = preProject
-		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = C:\Users\nem-e_000\Documents\Visual Studio 2012\Projects\Autolithium.core\Autolithium.compiler\bin\Debug\dyn.exe
-		RemoteMachine = ALEXANDRE-PC
-		StartingDirectory = C:\Users\nem-e_000\Documents\Visual Studio 2012\Projects\Autolithium.core\Autolithium.compiler\bin\Debug
-		Environment = Par défaut
-		LaunchingEngine = 00000000-0000-0000-0000-000000000000
-		LaunchSQLEngine = No
-		AttachLaunchAction = No
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dummy", "Dummy\Dummy.csproj", "{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,12 +49,16 @@ Global
 		{39E08B52-0B1D-45E9-97B6-DE4A727CF280}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{39E08B52-0B1D-45E9-97B6-DE4A727CF280}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{39E08B52-0B1D-45E9-97B6-DE4A727CF280}.Release|x86.ActiveCfg = Release|Any CPU
-		{14F48E5A-75E9-4044-8596-F2F19936356B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14F48E5A-75E9-4044-8596-F2F19936356B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{14F48E5A-75E9-4044-8596-F2F19936356B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{14F48E5A-75E9-4044-8596-F2F19936356B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{14F48E5A-75E9-4044-8596-F2F19936356B}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{14F48E5A-75E9-4044-8596-F2F19936356B}.Release|x86.ActiveCfg = Debug|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A278D8F8-CDF1-4E00-B2C9-0676BFBB3587}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

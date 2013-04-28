@@ -22,6 +22,7 @@ namespace Autolithium.core
         EXITLLOOPOUTSIDELOOP,
         FORWITHOUTTO,
         NOFUNCMATCH,
+        EXPECTUNTIL
     }
     public static class AutoitErrorMSG
     {
@@ -59,6 +60,8 @@ namespace Autolithium.core
                     return "({0}, {1}) A for loop must be 'for $var = first_value to last_value [step number_to_add]'";
                 case AutoitExceptionType.NOFUNCMATCH:
                     return "({0}, {1}) There is no function to match {2}";
+                case AutoitExceptionType.EXPECTUNTIL:
+                    return "({0}, {1}) the keyword \"until\" is expected, got {2}";
             }
             return "Error in the error : this error is unknown :'(";
         }

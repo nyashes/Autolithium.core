@@ -28,6 +28,7 @@ namespace Autolithium.core
                     break;
             }
             SeekRelative(-1);
+            
             return ParsePrimary();
         }
     }

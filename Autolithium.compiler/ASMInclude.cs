@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,9 +24,9 @@ namespace Autolithium.compiler
             //r.Generate();
             return Assembly.LoadFrom(Filen);
         }
-        public static ConstructorBuilder ResxLoader(TypeBuilder T)
+        public static ConstructorBuilder ResxLoader(TypeBuilder T, MethodInfo Next = null)
         {
-            var Method = T.DefineMethod("&=EventH", MethodAttributes.Static | MethodAttributes.Public, typeof(Assembly), new Type[] {typeof(object), typeof(ResolveEventArgs)});
+            var Method = T.DefineMethod("&=.EventH", MethodAttributes.Static | MethodAttributes.Public, typeof(Assembly), new Type[] {typeof(object), typeof(ResolveEventArgs)});
             ILGenerator EH = Method.GetILGenerator();
 
             EH.DeclareLocal(typeof(string));
@@ -83,9 +84,30 @@ namespace Autolithium.compiler
                 typeof(ResolveEventHandler).GetTypeInfo().GetConstructors().First());
             IL.EmitCall(OpCodes.Callvirt, typeof(AppDomain).GetTypeInfo().GetMethod("add_AssemblyResolve"), null);
             IL.Emit(OpCodes.Nop);
+            if (Next != null) IL.EmitCall(OpCodes.Call, Next, null);
             IL.Emit(OpCodes.Ret);
             return Ret;
 
+        }
+        public static void GenerateDelegateBinder(MethodBuilder Dest, IEnumerable<FunctionDefinition> D)
+        {
+            var IL = Dest.GetILGenerator();
+            var FDefine = typeof(Autcorlib).GetTypeInfo().DeclaredMethods.First(x => x.Name == "FUNCTIONDEFINE");
+            var FReg = typeof(Autcorlib).GetTypeInfo().DeclaredMethods.First(x => x.Name == "FUNCTIONREGISTER");
+            foreach (var f in D)
+            {
+                IL.Emit(OpCodes.Ldstr, f.MyName);
+                IL.EmitCall(OpCodes.Call, FDefine, null);
+                IL.Emit(OpCodes.Ldstr, f.MyName);
+                IL.Emit(OpCodes.Ldnull);
+                IL.Emit(OpCodes.Ldftn, f.Body);
+                IL.Emit(OpCodes.Newobj,
+                    f.Delegate.GetTypeInfo().GetConstructors().First());
+                IL.Emit(OpCodes.Stsfld, f.DelegateField);
+                IL.Emit(OpCodes.Ldsfld, f.DelegateField);
+                IL.EmitCall(OpCodes.Call, FReg, null);
+            }
+            IL.Emit(OpCodes.Ret);
         }
         public static Assembly RequireDLL(string Filen, string DestDir = null)
         {

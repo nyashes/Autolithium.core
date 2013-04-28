@@ -14,13 +14,16 @@ namespace Autolithium.core
         public Type MyType = typeof(object);
         public string ArgName;
         public bool IsByRef =false;
-        public Expression DefaultValue;
+        public Expression DefaultValue = Expression.Constant(null);
     }
     public class FunctionDefinition
     {
         public string MyName;
+        public Type ReturnType = typeof(object);
         public List<ArgumentDefinition> MyArguments = new List<ArgumentDefinition>();
-        public Expression Body;
+        public MethodInfo Body;
+        public Type Delegate;
+        public FieldInfo DelegateField;
     }
     public partial class LiParser
     {
@@ -52,6 +55,8 @@ namespace Autolithium.core
                 Parser.ConsumeWS();
                 if (Parser.Peek() == "=")
                 {
+                    Parser.Consume();
+                    Parser.ConsumeWS();
                     DefaultValue = Parser.ParseUnary();
                 }
                 Func.MyArguments.Add(new ArgumentDefinition()
@@ -86,7 +91,17 @@ namespace Autolithium.core
             foreach(var x in Func.MyArguments) 
                 Parameters.Add((Parser.VarCompilerEngine.Assign(x.ArgName, Expression.Constant(default(object), typeof(object))) as BinaryExpression).Left as ParameterExpression);
             var Ret = Expression.Label();
-            Parser.Contextual.Push(Expression.Goto(Ret, typeof(object)));
+            Parser.Contextual.Push(Expression.Goto(Ret, Func.ReturnType));
+            foreach (var x in Func.MyArguments.Where(x => x.DefaultValue != null))
+            {
+                var Exp = Parser.VarCompilerEngine.Assign(x.ArgName, 
+                    Expression.Coalesce(
+                        Parser.VarCompilerEngine.Access(x.ArgName, Parser.VarSynchronisation, x.MyType), 
+                        x.DefaultValue.GetOfType(Parser.VarCompilerEngine, Parser.VarSynchronisation, x.MyType)));
+                Output.AddRange(Parser.VarSynchronisation);
+                Parser.VarSynchronisation.Clear();
+                Output.Add(Exp);
+            }
             if (Parser.ScriptLine != "" && !Parser.ScriptLine.StartsWith(";"))
             {
                 ex = Parser.ParseBoolean();

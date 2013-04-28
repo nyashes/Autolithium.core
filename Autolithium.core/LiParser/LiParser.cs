@@ -14,7 +14,7 @@ namespace Autolithium.core
     {
         public List<Expression> VarSynchronisation = new List<Expression>();
         public List<Assembly> Included = new List<Assembly>();
-        public List<MethodInfo> DefinedMethods = new List<MethodInfo>();
+        public List<FunctionDefinition> DefinedMethods = new List<FunctionDefinition>();
         public AutoItVarCompilerEngine VarCompilerEngine = new AutoItVarCompilerEngine();
 
         public LiParser(string Line, int LNumber = -1)
@@ -29,7 +29,7 @@ namespace Autolithium.core
             ScriptLine = Script[0];
         }
 
-        public static LambdaExpression Parse(string s, List<MethodInfo> DefinedMethods, params Assembly[] Require)
+        public static LambdaExpression Parse(string s, List<FunctionDefinition> DefinedMethods, params Assembly[] Require)
         {
             var l = new LiParser(
                     Regex.Replace(s, ";(.*)((\r\n)|(\r)|(\n))", "\r\n")
@@ -40,6 +40,7 @@ namespace Autolithium.core
             l.DefinedMethods = DefinedMethods;
             Expression ex;
             List<Expression> Output = new List<Expression>();
+
             if (l.ScriptLine != "" && !l.ScriptLine.StartsWith(";"))
             {
                 ex = l.ParseBoolean();
@@ -58,6 +59,7 @@ namespace Autolithium.core
                 l.VarSynchronisation.Clear();
                 Output.Add(ex);
             }
+            if (Output.Count <= 0) return null;
             BlockExpression e = Expression.Block(l.VarCompilerEngine.DefinedVars, Output.ToArray().Where(x => x != null));
             
             return Expression.Lambda<Action<string[]>>(e, Expression.Parameter(typeof(string[]), "CmdLine"));

@@ -23,11 +23,13 @@ namespace Autolithium.core
                 case "WHILE": return ParseKeyword_WHILE(Keyword);
                 case "FOR": return ParseKeyword_FOR(Keyword);
                 case "RETURN": return ParseKeyword_RETURN(Keyword);
+                case "DO": return ParseKeyword_DO(Keyword);
                 case "ENDIF":
                 case "NEXT":
                 case "END":
                 case "WEND":
                 case "ENDWITH":
+                case "UNTIL":
                     return null;
                 case "EXITLOOP":
                     ConsumeWS();
