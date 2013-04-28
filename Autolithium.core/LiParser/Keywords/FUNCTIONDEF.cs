@@ -65,6 +65,8 @@ namespace Autolithium.core
                     ArgName = KW,
                     DefaultValue = DefaultValue
                 });
+                if (Parser.Peek() == ",") Parser.Consume(); 
+                
                 Parser.ConsumeWS();
                 //Parser.NextLine();
                 

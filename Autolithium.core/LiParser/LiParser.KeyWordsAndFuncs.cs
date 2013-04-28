@@ -24,6 +24,7 @@ namespace Autolithium.core
                 case "FOR": return ParseKeyword_FOR(Keyword);
                 case "RETURN": return ParseKeyword_RETURN(Keyword);
                 case "DO": return ParseKeyword_DO(Keyword);
+                case "DEFAULT": return Expression.Constant(null);
                 case "ENDIF":
                 case "NEXT":
                 case "END":

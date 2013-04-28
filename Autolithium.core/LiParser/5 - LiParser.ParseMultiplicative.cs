@@ -37,7 +37,7 @@ namespace Autolithium.core
                         continue;
                     case '%':
                         C2 = ParseExponent();
-                        C1 = Expression.Divide(
+                        C1 = Expression.Modulo(
                             C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
                             C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
                         continue;

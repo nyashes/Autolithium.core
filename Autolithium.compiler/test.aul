@@ -9,11 +9,11 @@ while $a[0]::int < 10000
 wend
 alert(TimerDiff($t))
 alert(lol())
-alert(plop())
+alert(plop(default, "kikoo"))
 alert(plop($t))
 func lol()
 	return plop('kikoo')
 endfunc
-func plop($test = 46546)
-	return 'plop ' & $test
+func plop($test = 46546, $lol = 5)
+	return 'plop ' & $test & ' ' & $lol
 endfunc
