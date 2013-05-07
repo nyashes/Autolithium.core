@@ -10,6 +10,7 @@ namespace Autolithium.core
     public partial class LiParser
     {
         private const string Reg_AlphaNum = @"[a-zA-Z0-9_]";
+        private const string Reg_Any = "[^,() \t\n\r]";
 
         #region Fields
         private string ScriptLine;
@@ -75,7 +76,7 @@ namespace Autolithium.core
             else
             {
                 Consume(2);
-                var s = Getstr(Reg_AlphaNum);
+                var s = Getstr(Reg_AlphaNum).ToLower();
                 switch (s)
                 {
                     case "float":
@@ -140,6 +141,13 @@ namespace Autolithium.core
             if (Script != null && LineNumber < Script.Length)
                 ScriptLine = Script[LineNumber++];
             else throw new IndexOutOfRangeException("Cannot move to next line in interactive mode or EOF reached");
+            Cursor = 0;
+        }
+        public void GotoLine(int L)
+        {
+            if (Script != null && L < Script.Length)
+                ScriptLine = Script[(LineNumber = L + 1) - 1];
+            else throw new IndexOutOfRangeException("Cannot move to a line in interactive mode or EOF reached");
             Cursor = 0;
         }
 

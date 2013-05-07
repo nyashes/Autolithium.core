@@ -24,6 +24,7 @@ namespace Autolithium.core
                 case "FOR": return ParseKeyword_FOR(Keyword);
                 case "RETURN": return ParseKeyword_RETURN(Keyword);
                 case "DO": return ParseKeyword_DO(Keyword);
+                case "NEW": return ParseKeyword_NEW(Keyword);
                 case "DEFAULT": return Expression.Constant(null);
                 case "ENDIF":
                 case "NEXT":
@@ -31,6 +32,7 @@ namespace Autolithium.core
                 case "WEND":
                 case "ENDWITH":
                 case "UNTIL":
+                case "ENDFUNC":
                     return null;
                 case "EXITLOOP":
                     ConsumeWS();
@@ -45,32 +47,147 @@ namespace Autolithium.core
                     if (str2 != "") goback2 = int.Parse(str2);
                     if (Contextual.Count > (goback2 - 1) * 2) return Contextual.ElementAt((goback2 - 1) * 2);
                     else throw new AutoitException(AutoitExceptionType.EXITLLOOPOUTSIDELOOP, LineNumber, Cursor);
-                default: return ParseKeyword_FUNCTIONCALL(Keyword);
+                default: return Parse_CALL(Keyword);
             }
         }
         private List<Expression> ParseBlock(bool IsLoop = false)
         {
+            return ParseBlock(VarCompilerEngine, IsLoop);
+        }
+        private List<Expression> ParseBlock(AutoItVarCompilerEngine VC, bool IsLoop = false)
+        {
             Expression Element;
             List<Expression> Instruction = new List<Expression>();
+            var VSync = VarSynchronisation;
+            var OldVC = VarCompilerEngine;
+            VarCompilerEngine = VC;
+
             var Dump = VarCompilerEngine.Save();
             do
             {
                 NextLine();
                 Element = ParseBoolean();
-                if (VarSynchronisation.Count > 0) Instruction.AddRange(VarSynchronisation);
-                VarSynchronisation.Clear();
+                if (VSync.Count > 0) Instruction.AddRange(VSync);
+                VSync.Clear();
                 if (Element != null) Instruction.Add(Element);
             }
             while (Element != null);
             if (IsLoop)
             {
-                VarCompilerEngine.Restore(Dump, VarSynchronisation);
-                if (VarSynchronisation.Count > 0) Instruction.AddRange(VarSynchronisation);
-                VarSynchronisation.Clear();
+                VarCompilerEngine.Restore(Dump, VSync);
+                if (VSync.Count > 0) Instruction.AddRange(VSync);
+                VSync.Clear();
                 Seek();
                 ConsumeWS();
             }
+
+            VarCompilerEngine = OldVC;
             return Instruction;
+        }
+
+
+        private List<Expression> ParseArgExpList()
+        {
+            List<Expression> Arguments = new List<Expression>();
+            ConsumeWS();
+            if (Peek(2) != "()") while (!EOL)
+                {
+                    ConsumeWS();
+                    if (Peek() == ")") break;
+                    else if (Peek() != "," && Peek() != "(") throw new AutoitException(AutoitExceptionType.EXPECTSYMBOL, LineNumber, Cursor, ",");
+                    Consume();
+
+                    Arguments.Add(ParseBoolean(false));
+                }
+            else Consume();
+            Consume();
+            return Arguments;
+        }
+        private List<ArgumentDefinition> ParseArgList()
+        {
+            List<ArgumentDefinition> Arguments = new List<ArgumentDefinition>();
+            ArgumentDefinition Ret;
+            ConsumeWS();
+            if (Peek(2) != "()") 
+                while (!EOL)
+                {
+                    ConsumeWS();
+                    if (Peek() == ")") break;
+                    else if (Peek() != "," && Peek() != "(") throw new AutoitException(AutoitExceptionType.EXPECTSYMBOL, LineNumber, Cursor, ",");
+                    Consume();
+                    ConsumeWS();
+
+                    Ret = new ArgumentDefinition();
+                    if (Getstr(Reg_AlphaNum).ToUpper() == "BYREF") Ret.IsByRef = true;
+                    ConsumeWS();
+                    if (Read() != "$") throw new AutoitException(AutoitExceptionType.EXPECTSYMBOL, LineNumber, Cursor, "$");
+                    Ret.ArgName = Getstr(Reg_AlphaNum);
+                    if (!TryParseCast(out Ret.MyType)) Ret.MyType = typeof(object);
+                    ConsumeWS();
+                    if (Peek() == "=")
+                    {
+                        Consume();
+                        Ret.DefaultValue = ParseBoolean(false);
+                    }
+                    else Ret.DefaultValue = Expression.Constant(Ret.MyType.Default(), Ret.MyType);
+                    Arguments.Add(Ret);
+                }
+            else Consume();
+            Consume();
+            return Arguments;
+        }
+        private dynamic SelectOverload(string Name, ref List<Expression> Params, TypeInfo Obj = null)
+        {
+            var ParamsRO = new List<Expression>(Params);
+            var Candidates = Obj == null ?
+                    Included.SelectMany(x => x.ExportedTypes)
+                    .Concat(new Type[] { typeof(Autcorlib) })
+                    .SelectMany(x => x.GetTypeInfo().DeclaredMethods
+                    .Where(y => y.Name/*.ToUpper()*/ == Name.ToUpper() &&
+                        y.GetParameters().Length >= ParamsRO.Count &&
+                        y.IsStatic))
+                        : Obj.DeclaredMethods.Where(y => y.Name.ToUpper() == Name.ToUpper() &&
+                            y.GetParameters().Length >= ParamsRO.Count &&
+                            !y.IsStatic);
+
+            var Func = Candidates.LastOrDefault(x => x.GetParameters()
+                                                    .Select(y => y.ParameterType)
+                                                    .SequenceEqual(ParamsRO.Select(y => y.Type)));
+            if (Func == default(MethodInfo))
+            {
+                Func = Candidates.LastOrDefault();
+                if (Func == default(MethodInfo))
+                {
+                    var FuncInfo = DefinedFunctions.Where(x =>
+                        x.MyName.ToUpper() == Name.ToUpper() &&
+                        x.MyArguments.Count >= ParamsRO.Count)
+                        .LastOrDefault();
+
+                    if (FuncInfo == default(FunctionDefinition))
+                        throw new AutoitException(AutoitExceptionType.NOFUNCMATCH, LineNumber, Cursor, Name + "(" + Params.Count + " parameters)");
+                    else
+                    {
+                        Params.AddRange(Enumerable.Repeat(Expression.Constant(null), FuncInfo.MyArguments.Count - ParamsRO.Count));
+                        Params = Params.Zip(FuncInfo.MyArguments, (x, y) =>
+                            x.GetOfType(VarCompilerEngine, VarSynchronisation, y.MyType))
+                            .ToList();
+                        return FuncInfo;
+                    }
+                }
+                else
+                {
+                    Params.AddRange(Enumerable.Repeat(Expression.Constant(null), Func.GetParameters().Length - ParamsRO.Count));
+                    Params = Params.Zip(Func.GetParameters(), (x, y) => 
+                        x.GetOfType(VarCompilerEngine, VarSynchronisation, y.ParameterType))
+                        .ToList();
+                    return Func;
+                }
+            }
+            else return Func;
+        }
+        private dynamic SelectOverload(string Name, ref List<Expression> Params, Expression Obj)
+        {
+            return SelectOverload(Name, ref Params, Obj == null ? null : Obj.Type.GetTypeInfo());
         }
     }
 }

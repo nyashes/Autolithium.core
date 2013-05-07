@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -106,6 +107,63 @@ namespace Autolithium.core
         public static string STRING(long obj) { return obj.ToString(CultureInfo.InvariantCulture); }
         public static string STRING(int obj) { return obj.ToString(CultureInfo.InvariantCulture); }
         public static string STRING(string obj) { return obj; }
+
+        public static int STRINGCOMPARE(string s1, string s2, int? casesence) 
+        {
+            casesence = casesence ?? 0; 
+            return (casesence != 1 ? s1.ToUpper() : s1).CompareTo((casesence != 1 ? s2.ToUpper() : s2)); 
+        }
+        public static int STRINGINSTR(string str, string substr, int? casesence, int? ocurrence, int? start, int? count)
+        {
+            casesence = casesence ?? 0;
+            ocurrence = ocurrence ?? 1;
+            count = count ?? str.Length;
+
+            int pos = start ?? 1; pos--;
+
+            if (ocurrence < 0)
+            {
+                ocurrence = -ocurrence;
+                pos--;
+                for (int i = 0; i < ocurrence; i++) pos = str.LastIndexOf(substr,
+                    (int)pos + 1,
+                    (int)count,
+                    casesence != 1 ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                return pos + 1;
+            }
+
+            pos++;
+            for (int i = 0; i < ocurrence; i++) pos = str.IndexOf(substr, 
+                (int)pos - 1,
+                (int)count, 
+                casesence != 1 ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+            return pos + 1;
+        }
+        public static bool STRINGISALNUM(string s)
+        {
+            return s.ToCharArray().All(x => (x >= '0' && x <= '9') || (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z'));
+        }
+        public static bool STRINGISALPHA(string s)
+        {
+            return s.ToCharArray().All(x => (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z'));
+        }
+        public static bool STRINGISASCII(string s)
+        {
+            return s.ToCharArray().All(x => x >= 0 && x <= 0x7f);
+        }
+        public static bool STRINGISDIGIT(string s)
+        {
+            return s.ToCharArray().All(x => x >= '0' && x <= '9');
+        }
+        public static bool STRINGISFLOAT(string s)
+        {
+            double Dummy;
+            return double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out Dummy);
+        }
+        public static string STRINGFORMAT(string s, params object[] args)
+        {
+            return string.Format(s, args);
+        }
         #endregion
 
         #region Trigonometric functions
@@ -142,6 +200,10 @@ namespace Autolithium.core
         #endregion
 
         #region Interop service
+        #endregion
+
+        #region Array management
+        public static int UBOUND(object[] i) { return i.Length; }
         #endregion
     }
 }

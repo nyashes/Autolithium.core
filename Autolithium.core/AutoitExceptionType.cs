@@ -22,7 +22,11 @@ namespace Autolithium.core
         EXITLLOOPOUTSIDELOOP,
         FORWITHOUTTO,
         NOFUNCMATCH,
-        EXPECTUNTIL
+        EXPECTUNTIL,
+        CLASSDOESNOTEXIXTS,
+        CONSTRUCTORMISMATCH,
+        EXPECTVAR,
+        EXPECTSYMBOL,
     }
     public static class AutoitErrorMSG
     {
@@ -61,7 +65,15 @@ namespace Autolithium.core
                 case AutoitExceptionType.NOFUNCMATCH:
                     return "({0}, {1}) There is no function to match {2}";
                 case AutoitExceptionType.EXPECTUNTIL:
-                    return "({0}, {1}) the keyword \"until\" is expected, got {2}";
+                    return "({0}, {1}) The keyword \"until\" is expected, got {2}";
+                case AutoitExceptionType.CLASSDOESNOTEXIXTS:
+                    return "({0}, {1}) The class \"{2}\" does not exists";
+                case AutoitExceptionType.CONSTRUCTORMISMATCH:
+                    return "({0}, {1}) Constructor mismatch : unable to get a good one";
+                case AutoitExceptionType.EXPECTVAR:
+                    return "({0}, {1}) Expect a variable after {2}";
+                case AutoitExceptionType.EXPECTSYMBOL:
+                    return "({0}, {1}) The symbol \"{2}\" is expected";
             }
             return "Error in the error : this error is unknown :'(";
         }

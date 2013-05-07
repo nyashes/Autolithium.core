@@ -10,11 +10,15 @@ using System.Threading.Tasks;
 
 namespace Autolithium.core
 {
+    public delegate Expression GetVar(string Name, Type T);
+    public delegate Expression SetVar(string Name, Type T, object Value);
+    public delegate Expression CallFunc(string Name, params Expression[] Args);
+
     public partial class LiParser
     {
         public List<Expression> VarSynchronisation = new List<Expression>();
         public List<Assembly> Included = new List<Assembly>();
-        public List<FunctionDefinition> DefinedMethods = new List<FunctionDefinition>();
+        public List<FunctionDefinition> DefinedFunctions = new List<FunctionDefinition>();
         public AutoItVarCompilerEngine VarCompilerEngine = new AutoItVarCompilerEngine();
 
         public LiParser(string Line, int LNumber = -1)
@@ -29,7 +33,11 @@ namespace Autolithium.core
             ScriptLine = Script[0];
         }
 
-        public static LambdaExpression Parse(string s, List<FunctionDefinition> DefinedMethods, params Assembly[] Require)
+        public static LambdaExpression Parse(
+            string s, 
+            DefineFuncDelegate D,
+            CompileFuncDelegate C,
+            params Assembly[] Require)
         {
             var l = new LiParser(
                     Regex.Replace(s, ";(.*)((\r\n)|(\r)|(\n))", "\r\n")
@@ -37,7 +45,14 @@ namespace Autolithium.core
             );
             
             l.Included = Require.ToList();
-            l.DefinedMethods = DefinedMethods;
+            l.DefineFunc = D;
+            l.CompileFunc = C;
+            l.DefineFunction();
+            l.CompileFunction();
+
+            l.Script = Regex.Replace(string.Join("\r", l.Script), "func(.*?)endfunc", "", RegexOptions.IgnoreCase | RegexOptions.Singleline).Split('\r');
+            l.GotoLine(0);
+
             Expression ex;
             List<Expression> Output = new List<Expression>();
 

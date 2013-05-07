@@ -115,5 +115,9 @@ namespace Autolithium.compiler
             File.Copy(Filen, Path.Combine(DestDir, Path.GetFileName(Filen)), true);
             return Assembly.LoadFrom(Filen);
         }
+        public static Assembly RequireNetFXASM(string ASMName)
+        {
+            return Assembly.Load(new AssemblyName(ASMName));
+        }
     }
 }

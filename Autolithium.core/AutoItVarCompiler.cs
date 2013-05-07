@@ -9,6 +9,7 @@ using System.Globalization;
 
 namespace Autolithium.core
 {
+    public delegate FieldInfo FieldGenerator(string Name, Type T);
     public class AutoItVarCompilerEngine
     {
         public Dictionary<string, AutoItVarCompiler> Get = new Dictionary<string, AutoItVarCompiler>();
@@ -23,11 +24,12 @@ namespace Autolithium.core
                     foreach (var i in e.Value.Where(x => !Get[e.Key].ActualType.Contains(x)))
                         Access(e.Key, Sync, i);
         }
-        public AutoItVarCompiler Createvar(string Name)
+        public AutoItVarCompiler Createvar(string Name, FieldGenerator Field = null)
         {
             Get.Add(Name, new AutoItVarCompiler()
             {
                 MyName = Name,
+                Field = Field
             });
             return Get[Name];
 
@@ -46,7 +48,10 @@ namespace Autolithium.core
         {
             get
             {
-                return Get.SelectMany(x => x.Value.PolymorphList.Select(y => y.Value)).ToArray();
+                return Get
+                    .SelectMany(x => x.Value.PolymorphList.Select(y => y.Value))
+                    .Where(x => x is ParameterExpression)
+                    .Cast<ParameterExpression>().ToArray();
             }
         }
     }
@@ -55,11 +60,12 @@ namespace Autolithium.core
         public static readonly MemberInfo InvariantCultureInfo = typeof(CultureInfo).GetRuntimeProperty("InvariantCulture");
 
         
-        public Dictionary<Type, ParameterExpression> PolymorphList = new Dictionary<Type, ParameterExpression>();
+        public Dictionary<Type, Expression> PolymorphList = new Dictionary<Type, Expression>();
         public List<Type> ActualType = new List<Type>();
         public Stack<Expression> ArrayIndex = new Stack<Expression>();
         public Stack<Type> MyType = new Stack<Type>();
         public string MyName;
+        public FieldGenerator Field;
         public AutoItVarCompilerEngine Parent;
         
 
@@ -73,7 +79,9 @@ namespace Autolithium.core
                     Expression.Convert(e, typeof(object)));
             }
             if (!PolymorphList.ContainsKey(e.Type)) 
-                PolymorphList.Add(e.Type, Expression.Parameter(e.Type, this.MyName));
+                if (Field == null)
+                    PolymorphList.Add(e.Type, Expression.Parameter(e.Type, this.MyName));
+                else PolymorphList.Add(e.Type, Expression.MakeMemberAccess(null, Field(this.MyName, e.Type)));
 
             ActualType.Clear();
             ActualType.Add(e.Type);
@@ -84,6 +92,15 @@ namespace Autolithium.core
                     if ((e as BinaryExpression).Right.NodeType == ExpressionType.Constant && (dynamic)((e as BinaryExpression).Right as ConstantExpression).Value == 1)
                         return Expression.PreIncrementAssign(PolymorphList[e.Type]);
                     return Expression.AddAssign(PolymorphList[e.Type], (e as BinaryExpression).Right);
+                }
+            }
+            if (e.NodeType == ExpressionType.Subtract)
+            {
+                if ((e as BinaryExpression).Left == PolymorphList[e.Type])
+                {
+                    if ((e as BinaryExpression).Right.NodeType == ExpressionType.Constant && (dynamic)((e as BinaryExpression).Right as ConstantExpression).Value == 1)
+                        return Expression.PreDecrementAssign(PolymorphList[e.Type]);
+                    return Expression.SubtractAssign(PolymorphList[e.Type], (e as BinaryExpression).Right);
                 }
             }
             return Expression.Assign(PolymorphList[e.Type], e);
@@ -145,11 +162,18 @@ namespace Autolithium.core
                 Expression.Convert(e, typeof(object));
             if (Destination == typeof(bool)) return
                 Expression.GreaterThan(GenericConvert(e, typeof(double)), Expression.Constant(0, typeof(double)));
-            else if (Destination == typeof(string)) return
-                Expression.Call(
-                                typeof(Convert).GetRuntimeMethod("ToString", new Type[] { e.Type, typeof(IFormatProvider) }),
-                                e,
-                                Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo));
+            else if (Destination == typeof(string)) try
+                {
+                    return
+                        Expression.Call(
+                        typeof(Convert).GetRuntimeMethod("ToString", new Type[] { e.Type, typeof(IFormatProvider) }),
+                        e,
+                        Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo));
+                }
+                catch
+                {
+                    return Expression.Call(e, e.Type.GetTypeInfo().DeclaredMethods.First(x => x.Name == "ToString"));
+                }
             else return Expression.Convert(
                             Expression.Call(
                                 typeof(Convert).GetRuntimeMethod("ChangeType", new Type[] { typeof(object), typeof(Type), typeof(IFormatProvider) }),
@@ -182,6 +206,7 @@ namespace Autolithium.core
             {
                 case ExpressionType.Constant:
                     var val = value as ConstantExpression;
+                    if (val.Value == null) return Expression.Constant(null, desired.First());
                     if (desired.Contains(val.Type)) return val;
                     else
                     {
@@ -219,6 +244,17 @@ namespace Autolithium.core
                             desired.First());
                 default:
                     return value;
+            }
+        }
+        public static object Default(this Type t)
+        {
+            if (t.GetTypeInfo().IsValueType)
+            {
+                return Activator.CreateInstance(t);
+            }
+            else
+            {
+                return null;
             }
         }
         public static Type LargestNumeric(Type t1, Type t2)

@@ -4,18 +4,19 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Autolithium.core
 {
     public partial class LiParser
     {
-        private Expression ParsePrimary(Type Desired = null)
+        private Expression ParseUltraPrimary()
         {
             ConsumeWS();
             char ch = Read()[0];
-            Expression Ret;
             string szTemp;
+            Expression Ret;
             switch (ch)
             {
                 case ']':
@@ -87,10 +88,54 @@ namespace Autolithium.core
                         else
                             return Expression.Constant(int.Parse(szTemp, CultureInfo.InvariantCulture), typeof(int));
                     }
-                    szTemp = Getstr(Reg_AlphaNum);
-                    if (szTemp != "") return ParseKeywordOrFunc(szTemp);
+                    szTemp = Getstr(Reg_Any);
+                    if (szTemp != "")
+                    {
+                        if (szTemp.Contains("."))
+                        {
+                            var AType = Included.SelectMany(x => x.ExportedTypes).FirstOrDefault(
+                                x => {
+                                    var Nr = x.FullName.ToUpper().Split('.');
+                                    return Nr.SequenceEqual(szTemp.ToUpper().Split('.').Take(Nr.Count()));
+                                });
+                            if (AType != default(Type))
+                            {
+                                SeekRelative(AType.FullName.Length - szTemp.Length);
+                                return Expression.Constant(null, AType.GetTypeInfo().IsValueType ? typeof(Nullable<>).MakeGenericType(AType) : AType);
+                            }
+                        }
+                        else return ParseKeywordOrFunc(szTemp);
+                    }
                     throw new AutoitException(AutoitExceptionType.LEXER_NOTRECOGNISED, LineNumber, Cursor, "" + ch);
             }
         }
+        private Expression ParsePrimary(Type Desired = null)
+        {
+
+            Expression Ret;
+
+            Ret = ParseUltraPrimary();
+            ConsumeWS();
+            while (Peek() == ".")
+            {
+                Consume();
+                ConsumeWS();
+                var MName = Getstr(Reg_AlphaNum);
+                ConsumeWS();
+                var RetType = (Ret.Type.GetTypeInfo().IsGenericType && Ret.Type.GetGenericTypeDefinition() == typeof(Nullable<>) ?
+                    Ret.Type.GetTypeInfo().GenericTypeArguments.First().GetTypeInfo() :
+                    Ret.Type.GetTypeInfo());
+                var RetVal = (Ret.NodeType == ExpressionType.Constant && (Ret as ConstantExpression).Value == null) ? null : Ret;
+                if (Peek() == "(")
+                {
+                    var Args = ParseArgExpList();
+                    var Method = (MethodInfo)SelectOverload(MName, ref Args, RetType);
+                    Ret = Expression.Call(RetVal, Method, Args);
+                }
+                else Ret = Expression.MakeMemberAccess(RetVal, RetType.DeclaredMembers.First(x => x.Name == MName));
+                ConsumeWS();
+            } 
+            return Ret;
+        }        
     }
 }

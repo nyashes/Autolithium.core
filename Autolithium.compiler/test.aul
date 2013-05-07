@@ -1,6 +1,8 @@
 ﻿$a[2]
 $a[0] = 1
 $a[1] = ''
+$test = new System.IntPtr(588)
+$test2 = System.DateTime.Now;
 $t = TimerInit()
 while $a[0]::int < 10000
 	$a[0]::int +=1
@@ -11,9 +13,12 @@ alert(TimerDiff($t))
 alert(lol())
 alert(plop(default, "kikoo"))
 alert(plop($t))
-func lol()
+alert("we are in " & $t.Year.ToString());
+alert($test)
+alert($test2)
+func lol()::string
 	return plop('kikoo')
 endfunc
-func plop($test = 46546, $lol = 5)
+func plop($test::string = 46546, $lol::string = 5)::string
 	return 'plop ' & $test & ' ' & $lol
 endfunc
