@@ -24,9 +24,9 @@ namespace Autolithium.core
                 if (Peek(5).ToUpper() != "UNTIL") throw new AutoitException(AutoitExceptionType.EXPECTUNTIL, LineNumber, Cursor, Getstr(Reg_AlphaNum));
                 Consume(5);
                 ConsumeWS();
-                var Cond = Expression.Not(ParseBoolean(false).GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool)));
-                Instruction.AddRange(VarSynchronisation);
-                VarSynchronisation.Clear();
+                var Cond = Expression.Not(ParseBoolean(false).ConvertTo(typeof(bool)));
+                //Instruction.AddRange(VarSynchronisation);
+                //VarSynchronisation.Clear();
                 Instruction.Add(Expression.IfThen(Cond, Expression.Goto(@continue)));
                 Instruction.Add(Expression.Label(@break));
                 Contextual.Pop();

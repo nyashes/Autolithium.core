@@ -11,7 +11,7 @@ namespace Autolithium.core
     {
         private Expression ParseKeyword_WHILE(string Keyword)
         {
-            var Element = ParseBoolean(false).GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool));
+            var Element = ParseBoolean(false).ConvertTo(typeof(bool));
             ConsumeWS();
             if (!EOL)
             {

@@ -24,14 +24,14 @@ namespace Autolithium.core
                     case 'A': if (Peek(3).ToUpper() == "ND ")
                         {
                             Consume(3);
-                            C1 = Expression.AndAlso(C1.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool)), ParseRelationnal(ExpectAssign).GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool)));
+                            C1 = Expression.AndAlso(C1.ConvertTo(typeof(bool)), ParseRelationnal(ExpectAssign).ConvertTo(typeof(bool)));
                         }
                         else break;
                         continue;
                     case 'O': if (Peek(2).ToUpper() == "R ")
                         {
                             Consume(2);
-                            C1 = Expression.OrElse(C1.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool)), ParseRelationnal(ExpectAssign).GetOfType(VarCompilerEngine, VarSynchronisation, typeof(bool)));
+                            C1 = Expression.OrElse(C1.ConvertTo(typeof(bool)), ParseRelationnal(ExpectAssign).ConvertTo(typeof(bool)));
                         }
                         else break;
                         continue;

@@ -25,8 +25,7 @@ namespace Autolithium.core
             var Selected = Candidates.FirstOrDefault(x => x.GetParameters().Select(y => y.ParameterType).SequenceEqual(Params));
             if (Selected == default(ConstructorInfo)) Selected = Candidates.First();
             return Expression.New(Selected, 
-                Arguments.Select(x => x.GetOfType(VarCompilerEngine, VarSynchronisation, 
-                    Selected.GetParameters().Select(y => y.ParameterType).ToArray())));
+                Arguments.Zip(Selected.GetParameters().Select(z => z.ParameterType) , (x, y) => x.ConvertTo(y)));
         }
     }
 }

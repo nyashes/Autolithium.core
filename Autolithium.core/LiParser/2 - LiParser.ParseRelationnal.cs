@@ -25,7 +25,7 @@ namespace Autolithium.core
                         if (Peek() == ">")
                         {
                             Consume();
-                            C2 = ParseConcat().GetOfType(VarCompilerEngine, VarSynchronisation, C1.Type);
+                            C2 = ParseConcat().ConvertTo(C1.Type);
                             C1 = Expression.NotEqual(C1, C2);
 
                         }
@@ -34,15 +34,15 @@ namespace Autolithium.core
                             Consume();
                             C2 = ParseConcat();
                             C1 = Expression.LessThanOrEqual(
-                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         }
                         else
                         {
                             C2 = ParseConcat();
                             C1 = Expression.LessThan(
-                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         }
 
                         continue;
@@ -52,15 +52,15 @@ namespace Autolithium.core
                             Consume();
                             C2 = ParseConcat();
                             C1 = Expression.GreaterThanOrEqual(
-                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         }
                         else
                         {
                             C2 = ParseConcat();
                             C1 = Expression.GreaterThan(
-                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         }
                         continue;
                     case '=':
@@ -72,12 +72,11 @@ namespace Autolithium.core
                         }
                         else if (ExpectAssign)
                         {
-                            if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
+                            if (C1 is VarAutExpression)
                             {
                                 Consume();
                                 var value = ParseBoolean(false);
-                                C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name, value);
-
+                                C1 = (C1 as VarAutExpression).Setter(value);
                             }
                             else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
                         }
@@ -85,79 +84,72 @@ namespace Autolithium.core
                         {
                             C2 = ParseConcat();
                             C1 = Expression.Equal(
-                                C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                                C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         }
                         continue;
                     case '+':
                         if (Peek() != "=" || !ExpectAssign) break;
                         Consume();
-                        if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
+                        if (C1 is VarAutExpression)
                         {
-                            if ((C1 as ParameterExpression).Name.EndsWith("[]"))
-                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
-                                    VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
                             ConsumeWS();
                             C2 = ParseBoolean(false);
-                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
+                            C1 = (C1 as VarAutExpression).Setter(
                                 Expression.Add(
-                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
-
+                                    (C1 as VarAutExpression).Getter(ExpressionTypeBeam.Largest(C1.Type, C2.Type)), 
+                                    C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type))
+                                )
+                            );          
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
                         continue;
                     case '-':
                         if (Peek() != "=" || !ExpectAssign) break;
                         Consume();
-                        if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
+                        if (C1 is VarAutExpression)
                         {
-                            if ((C1 as ParameterExpression).Name.EndsWith("[]"))
-                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
-                                    VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
                             ConsumeWS();
                             C2 = ParseBoolean(false);
-                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
+                            C1 = (C1 as VarAutExpression).Setter(
                                 Expression.Subtract(
-                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
-
+                                    (C1 as VarAutExpression).Getter(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                    C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type))
+                                )
+                            );
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
                         continue;
                     case '*':
                         if (Peek() != "=" || !ExpectAssign) break;
                         Consume();
-                        if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
+                        if (C1 is VarAutExpression)
                         {
-                            if ((C1 as ParameterExpression).Name.EndsWith("[]"))
-                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
-                                    VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
                             ConsumeWS();
                             C2 = ParseBoolean(false);
-                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
+                            C1 = (C1 as VarAutExpression).Setter(
                                 Expression.Multiply(
-                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type))));
-
+                                    (C1 as VarAutExpression).Getter(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                    C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type))
+                                )
+                            );
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
                         continue;
                     case '/':
                         if (Peek() != "=" || !ExpectAssign) break;
-                        if ((C1 as ParameterExpression).Name.EndsWith("[]"))
-                            VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Push(
-                                VarCompilerEngine.Get[(C1 as ParameterExpression).Name].ArrayIndex.Peek());
-                        ConsumeWS();
-                        if (C1.NodeType == ExpressionType.Parameter || C1.NodeType == ExpressionType.ArrayIndex)
-                        {
-                            Consume();
-                            C2 = ParseBoolean(false);
-                            C1 = VarCompilerEngine.Assign((C1 as ParameterExpression).Name,
-                                Expression.Divide(
-                                    VarCompilerEngine.Access((C1 as ParameterExpression).Name, VarSynchronisation, typeof(double)),
-                                    C2.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(double))));
 
+                        ConsumeWS();
+                        if (C1 is VarAutExpression)
+                        {
+                            ConsumeWS();
+                            C2 = ParseBoolean(false);
+                            C1 = (C1 as VarAutExpression).Setter(
+                                Expression.Divide(
+                                    (C1 as VarAutExpression).Getter(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                                    C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type))
+                                )
+                            );
                         }
                         else throw new AutoitException(AutoitExceptionType.ASSIGNTONOTVARIABLE, LineNumber, Cursor, C1.ToString());
                         continue;

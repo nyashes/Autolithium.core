@@ -17,43 +17,45 @@ namespace Autolithium.core
             ConsumeWS();
             if (Peek(1).ToUpper() != "=") throw new AutoitException(AutoitExceptionType.FORWITHOUTTO, LineNumber, Cursor);
             Consume(); ConsumeWS();
-            InitVal = ParseBoolean().GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.Numeric);
+            InitVal = ParseBoolean().ConvertToNumber();
             ConsumeWS();
             if (Peek(2).ToUpper() != "TO") throw new AutoitException(AutoitExceptionType.FORWITHOUTTO, LineNumber, Cursor);
             Consume(2); ConsumeWS();
-            LastVal = ParseBoolean().GetOfType(VarCompilerEngine, VarSynchronisation, InitVal.Type);
+            LastVal = ParseBoolean().ConvertTo(InitVal.Type);
             ConsumeWS();
             if (Peek(4).ToUpper() == "STEP")
             {
                 Consume(4); ConsumeWS();
-                Step = ParseBoolean().GetOfType(VarCompilerEngine, VarSynchronisation, InitVal.Type);
+                Step = ParseBoolean().ConvertTo(InitVal.Type);
             }
             else Step = Expression.Constant(1, InitVal.Type);
             if (!INTERCATIVE)
             {
                 var @break = Expression.Label("break");
                 var @continue = Expression.Label("continue");
+                var @DownTo = VarAutExpression.VariableAccess("downto-" + Contextual.Count, false);
+                var @LoopVar = VarAutExpression.VariableAccess(ForVarName, false);
                 Contextual.Push(Expression.Goto(@break));
                 Contextual.Push(Expression.Goto(@continue));
                 List<Expression> Instruction = new List<Expression>();
                 if (Step is ConstantExpression)
-                    Instruction.Add(VarCompilerEngine.Assign("downto-" + Contextual.Count, Expression.Constant((dynamic)(Step as ConstantExpression).Value < 0, typeof(bool))));
-                else Instruction.Add(VarCompilerEngine.Assign("downto-" + Contextual.Count, Expression.LessThan(Step, Expression.Constant(0, InitVal.Type))));
-                Instruction.Add(VarCompilerEngine.Assign(ForVarName, InitVal));
+                    Instruction.Add(@DownTo.Setter((ConstantExpression)Expression.Constant((dynamic)(Step as ConstantExpression).Value < 0, typeof(bool))));
+                else Instruction.Add(@DownTo.Setter(Expression.LessThan(Step, Expression.Constant(0, InitVal.Type))));
+                Instruction.Add(@LoopVar.Setter(InitVal));
                 Instruction.Add(Expression.Label(@continue));
                 Instruction.Add(Expression.IfThen(
                     Expression.OrElse(
                         Expression.AndAlso(
-                            VarCompilerEngine.Access("downto-" + Contextual.Count, VarSynchronisation, typeof(bool)),
-                            Expression.LessThan(VarCompilerEngine.Access(ForVarName, VarSynchronisation, InitVal.Type), LastVal)),
+                            @DownTo.Getter(typeof(bool)),
+                            Expression.LessThan(@LoopVar.Getter(InitVal.Type), LastVal)),
                         Expression.AndAlso(
-                            Expression.Not(VarCompilerEngine.Access("downto-" + Contextual.Count, VarSynchronisation, typeof(bool))),
-                            Expression.GreaterThan(VarCompilerEngine.Access(ForVarName, VarSynchronisation, InitVal.Type), LastVal)))
+                            Expression.Not(@DownTo.Getter(typeof(bool))),
+                            Expression.GreaterThan(@LoopVar.Getter(InitVal.Type), LastVal)))
                     , Expression.Goto(@break)));
                 Instruction.AddRange(ParseBlock(true));
                 Instruction.Add(Expression.Assign(
-                    VarCompilerEngine.Access(ForVarName, VarSynchronisation, InitVal.Type),
-                    Expression.Add(VarCompilerEngine.Access(ForVarName, VarSynchronisation, InitVal.Type), Step)));
+                    @LoopVar.Getter(InitVal.Type),
+                    Expression.Add(@LoopVar.Getter(InitVal.Type), Step)));
                 Instruction.Add(Expression.Goto(@continue));
                 Instruction.Add(Expression.Label(@break));
                 Contextual.Pop();

@@ -25,21 +25,21 @@ namespace Autolithium.core
                         if (Peek() == "=") break;
                         C2 = ParseExponent();
                         C1 = Expression.Multiply(
-                            C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                            C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                            C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                            C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         continue;
                     case '/':
                         if (Peek() == "=") break;
                         C2 = ParseExponent();
                         C1 = Expression.Divide(
-                            C1.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(double)),
-                            C2.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(double)));
+                            C1.ConvertTo(typeof(double)),
+                            C2.ConvertTo(typeof(double)));
                         continue;
                     case '%':
                         C2 = ParseExponent();
                         C1 = Expression.Modulo(
-                            C1.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)),
-                            C2.GetOfType(VarCompilerEngine, VarSynchronisation, ExpressionExtension.LargestNumeric(C1.Type, C2.Type)));
+                            C1.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)),
+                            C2.ConvertTo(ExpressionTypeBeam.Largest(C1.Type, C2.Type)));
                         continue;
                 }
                 SeekRelative(-1);

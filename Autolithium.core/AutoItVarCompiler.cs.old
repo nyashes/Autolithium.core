@@ -13,6 +13,12 @@ namespace Autolithium.core
     public class AutoItVarCompilerEngine
     {
         public Dictionary<string, AutoItVarCompiler> Get = new Dictionary<string, AutoItVarCompiler>();
+        public LiParser Parent;
+        public AutoItVarCompilerEngine(LiParser ParentLi)
+        {
+            Parent = ParentLi;
+        }
+
         public KeyValuePair<string, Type[]>[] Save()
         {
             return Get.Select(x => new KeyValuePair<string, Type[]>(x.Key, x.Value.ActualType.ToArray())).ToArray();
@@ -37,12 +43,21 @@ namespace Autolithium.core
         public Expression Assign(string Name, Expression e)
         {
             if (Get.ContainsKey(Name)) return Get[Name].Assign(e);
-            else return Createvar(Name).Assign(e);
+            else
+            {
+                if (Parent.GetVar(Name, Parent, e.Type) != null) return Parent.SetVar(Name, Parent, e);
+                else return Createvar(Name).Assign(e);
+            }
         }
         public Expression Access(string Name, List<Expression> Sync, params Type[] desired)
         {
             if (Get.ContainsKey(Name)) return Get[Name].Access(Sync, desired);
-            else throw new AutoitException(AutoitExceptionType.MISSINGVAR, 0, 0, Name);
+            else
+            {
+                var V = Parent.GetVar(Name, Parent, desired);
+                if (V != null) return V;
+                else throw new AutoitException(AutoitExceptionType.MISSINGVAR, Parent.LineNumber, -1, Name);
+            }
         }
         public ParameterExpression[] DefinedVars
         {
@@ -113,7 +128,7 @@ namespace Autolithium.core
                 var T = MyType.Pop();
                 var Index = ArrayIndex.Pop();
                 Expression Ret = PolymorphList.First().Value;
-                if (Index != null) Ret = Expression.ArrayAccess(Ret, Index.GetOfType(Parent, Sync, typeof(int)));
+                if (Index != null) Ret = Expression.ArrayAccess(Ret, Index.ConvertTo(typeof(int)));
                 if (T != null) Ret = Expression.Convert(Ret, T);
                 if (T != null && desired.First() != T) //We should convert it correctly
                 {
@@ -229,11 +244,31 @@ namespace Autolithium.core
                     return e.Access(val2.Name, Sync, desired);
                 case ExpressionType.Call:
                 case ExpressionType.Invoke:
+                case ExpressionType.MemberAccess:
+                case ExpressionType.ArrayIndex:
+                default:
                     if (ExpressionExtension.Numeric.Contains(value.Type)
                     && desired.Any(x => ExpressionExtension.Numeric.Contains(x)))
                     {
                         return Expression.Convert(value,
                             ExpressionExtension.LargestNumeric(desired));
+                    }
+                    else if (desired.Contains(typeof(string)))
+                    {
+                        try
+                        {
+                            return Expression.Call(
+                                    typeof(Convert).GetRuntimeMethod("ToString", new Type[] { value.Type, typeof(IFormatProvider) }),
+                                    value,
+                                    Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo));
+                        }
+                        catch
+                        {
+                            return Expression.Call(
+                                    typeof(Convert).GetRuntimeMethod("ToString", new Type[] { typeof(object), typeof(IFormatProvider) }),
+                                    Expression.Convert(value, typeof(object)),
+                                    Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo));
+                        }
                     }
                     else return Expression.Convert(
                             Expression.Call(
@@ -242,8 +277,8 @@ namespace Autolithium.core
                                 Expression.Constant(desired.First(), typeof(Type)),
                                 Expression.MakeMemberAccess(null, AutoItVarCompiler.InvariantCultureInfo)),
                             desired.First());
-                default:
-                    return value;
+                /*default:
+                    return value;*/
             }
         }
         public static object Default(this Type t)

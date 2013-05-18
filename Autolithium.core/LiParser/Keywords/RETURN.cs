@@ -11,9 +11,11 @@ namespace Autolithium.core
     {
         private Expression ParseKeyword_RETURN(string Keyword)
         {
-            VarSynchronisation.Add(VarCompilerEngine.Assign("Return-store", ParseBoolean(false).GetOfType(VarCompilerEngine, VarSynchronisation, VarCompilerEngine.Get["Return-store"].ActualType.First())));
-            //VarSynchronisation.Add(VarCompilerEngine.Access("Return-store", VarSynchronisation, typeof(object)));
-            return Contextual.Peek();
+            return Expression.Block(Contextual.Peek().Type, 
+                VarAutExpression.VariableAccess("Return-store").Setter(ParseBoolean(false)).ConvertTo(Contextual.Peek().Type)
+                , Contextual.Peek());
+            /*VarSynchronisation.Add();
+            return Contextual.Peek();*/
             
         }
     }

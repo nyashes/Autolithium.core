@@ -25,8 +25,8 @@ namespace Autolithium.core
                     case '&':
                         C1 = Expression.Call(
                             typeof(string).GetRuntimeMethod("Concat", new Type[] { typeof(string), typeof(string) }),
-                            new Expression[] {C1.GetOfType(VarCompilerEngine, VarSynchronisation, typeof(string)),  
-                                ParseAdditive().GetOfType(VarCompilerEngine, VarSynchronisation, typeof(string))});
+                            new Expression[] {C1.ConvertToString(),  
+                                ParseAdditive().ConvertToString()});
                         continue;
                 }
                 SeekRelative(-1);

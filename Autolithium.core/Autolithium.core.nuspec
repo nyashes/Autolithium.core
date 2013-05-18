@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package>
+  <metadata>
+    <id>Autolithium.core</id>
+    <version>0.0.1</version>
+    <authors>Alexandre THOUVENIN</authors>
+    <description>Autolithium.core contains an autoit-like .NET 4.5/Windows phone 8/Windows store compiler that can be extended to compile a script to a .NET assembly or to a script host to extend your application, see Autolithium.compiler and Autolithium.host for more informations about that</description>
+    <tags>Autoit Script dlr Autolithium Script-engine compiler</tags>
+    <language>en-US</language>
+  </metadata>
+</package>

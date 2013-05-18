@@ -10,23 +10,19 @@ using System.Threading.Tasks;
 
 namespace Autolithium.core
 {
-    public delegate Expression GetVar(string Name, Type T);
-    public delegate Expression SetVar(string Name, Type T, object Value);
-    public delegate Expression CallFunc(string Name, params Expression[] Args);
-
     public partial class LiParser
     {
-        public List<Expression> VarSynchronisation = new List<Expression>();
         public List<Assembly> Included = new List<Assembly>();
         public List<FunctionDefinition> DefinedFunctions = new List<FunctionDefinition>();
-        public AutoItVarCompilerEngine VarCompilerEngine = new AutoItVarCompilerEngine();
+        //public AutoItVarCompilerEngine VarCompilerEngine;
 
-        public LiParser(string Line, int LNumber = -1)
+        //public LiParser() { VarCompilerEngine = new AutoItVarCompilerEngine(this); }
+        public LiParser(string Line, int LNumber = -1) 
         {
             ScriptLine = Line;
             LineNumber = LNumber;
         }
-        public LiParser(string Text)
+        public LiParser(string Text) 
         {
             Script = Text.Split(new string[] { "\r", "\n"}, StringSplitOptions.None);
             LineNumber = 1;
@@ -37,6 +33,9 @@ namespace Autolithium.core
             string s, 
             DefineFuncDelegate D,
             CompileFuncDelegate C,
+            GetVarDelegate G,
+            SetVarDelegate S,
+            CreateVarDelegate CR,
             params Assembly[] Require)
         {
             var l = new LiParser(
@@ -47,9 +46,14 @@ namespace Autolithium.core
             l.Included = Require.ToList();
             l.DefineFunc = D;
             l.CompileFunc = C;
+            l.GetVar = G;
+            l.SetVar = S;
+            l.CreateVar = CR;
+            ExpressionTypeBeam.InitializeParameterEngine(G, S, CR);
+            ExpressionTypeBeam.PushScope();
             l.DefineFunction();
-            l.CompileFunction();
-
+            l.LiCompileFunction();
+            
             l.Script = Regex.Replace(string.Join("\r", l.Script), "func(.*?)endfunc", "", RegexOptions.IgnoreCase | RegexOptions.Singleline).Split('\r');
             l.GotoLine(0);
 
@@ -59,8 +63,7 @@ namespace Autolithium.core
             if (l.ScriptLine != "" && !l.ScriptLine.StartsWith(";"))
             {
                 ex = l.ParseBoolean();
-                foreach (var x in l.VarSynchronisation) Output.Add(x);
-                l.VarSynchronisation.Clear();
+                if (ex is VarAutExpression) ex = (ex as VarAutExpression).Generator();
                 Output.Add(ex);
             }
             while (!l.EOF)
@@ -70,12 +73,11 @@ namespace Autolithium.core
                 if (l.ScriptLine == "" || l.ScriptLine.StartsWith(";")) continue;
                 
                 ex = l.ParseBoolean();
-                Output.AddRange(l.VarSynchronisation);
-                l.VarSynchronisation.Clear();
+                if (ex is VarAutExpression) ex = (ex as VarAutExpression).Generator();
                 Output.Add(ex);
             }
             if (Output.Count <= 0) return null;
-            BlockExpression e = Expression.Block(l.VarCompilerEngine.DefinedVars, Output.ToArray().Where(x => x != null));
+            BlockExpression e = Expression.Block(ExpressionTypeBeam.PopScope(), Output.ToArray().Where(x => x != null));
             
             return Expression.Lambda<Action<string[]>>(e, Expression.Parameter(typeof(string[]), "CmdLine"));
         }

@@ -26,6 +26,7 @@ namespace Autolithium.core
                 case "DO": return ParseKeyword_DO(Keyword);
                 case "NEW": return ParseKeyword_NEW(Keyword);
                 case "DEFAULT": return Expression.Constant(null);
+                case "GLOBAL": return ParseKeyword_GLOBAL(Keyword);
                 case "ENDIF":
                 case "NEXT":
                 case "END":
@@ -33,7 +34,7 @@ namespace Autolithium.core
                 case "ENDWITH":
                 case "UNTIL":
                 case "ENDFUNC":
-                    return null;
+                    return AutExpression.EndOfBlock();
                 case "EXITLOOP":
                     ConsumeWS();
                     int goback = 1;
@@ -50,38 +51,25 @@ namespace Autolithium.core
                 default: return Parse_CALL(Keyword);
             }
         }
-        private List<Expression> ParseBlock(bool IsLoop = false)
-        {
-            return ParseBlock(VarCompilerEngine, IsLoop);
-        }
-        private List<Expression> ParseBlock(AutoItVarCompilerEngine VC, bool IsLoop = false)
+        private List<Expression> ParseBlock(bool RestoreAfter = false)
         {
             Expression Element;
             List<Expression> Instruction = new List<Expression>();
-            var VSync = VarSynchronisation;
-            var OldVC = VarCompilerEngine;
-            VarCompilerEngine = VC;
 
-            var Dump = VarCompilerEngine.Save();
+            if (RestoreAfter) ExpressionTypeBeam.TakeSnapshot();
             do
             {
                 NextLine();
                 Element = ParseBoolean();
-                if (VSync.Count > 0) Instruction.AddRange(VSync);
-                VSync.Clear();
-                if (Element != null) Instruction.Add(Element);
+                if (!(Element is AutExpression) || (Element as AutExpression).ExpressionType != AutExpressionType.EndOfBlock) Instruction.Add(Element);
             }
-            while (Element != null);
-            if (IsLoop)
+            while (!(Element is AutExpression) || (Element as AutExpression).ExpressionType != AutExpressionType.EndOfBlock);
+            if (RestoreAfter)
             {
-                VarCompilerEngine.Restore(Dump, VSync);
-                if (VSync.Count > 0) Instruction.AddRange(VSync);
-                VSync.Clear();
+                ExpressionTypeBeam.RestoreSnapshot();
                 Seek();
                 ConsumeWS();
             }
-
-            VarCompilerEngine = OldVC;
             return Instruction;
         }
 
@@ -129,7 +117,7 @@ namespace Autolithium.core
                         Consume();
                         Ret.DefaultValue = ParseBoolean(false);
                     }
-                    else Ret.DefaultValue = Expression.Constant(Ret.MyType.Default(), Ret.MyType);
+                    else Ret.DefaultValue = Expression.Constant(Ret.MyType.DefaultValue(), Ret.MyType);
                     Arguments.Add(Ret);
                 }
             else Consume();
@@ -169,7 +157,7 @@ namespace Autolithium.core
                     {
                         Params.AddRange(Enumerable.Repeat(Expression.Constant(null), FuncInfo.MyArguments.Count - ParamsRO.Count));
                         Params = Params.Zip(FuncInfo.MyArguments, (x, y) =>
-                            x.GetOfType(VarCompilerEngine, VarSynchronisation, y.MyType))
+                            x.ConvertTo(y.MyType))
                             .ToList();
                         return FuncInfo;
                     }
@@ -177,8 +165,8 @@ namespace Autolithium.core
                 else
                 {
                     Params.AddRange(Enumerable.Repeat(Expression.Constant(null), Func.GetParameters().Length - ParamsRO.Count));
-                    Params = Params.Zip(Func.GetParameters(), (x, y) => 
-                        x.GetOfType(VarCompilerEngine, VarSynchronisation, y.ParameterType))
+                    Params = Params.Zip(Func.GetParameters(), (x, y) =>
+                        x.ConvertTo(y.ParameterType))
                         .ToList();
                     return Func;
                 }

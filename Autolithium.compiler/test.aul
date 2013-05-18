@@ -1,13 +1,13 @@
-﻿$a[2]
+﻿global $a[2]::string
 $a[0] = 1
 $a[1] = ''
-$test = new System.IntPtr(588)
+global $test = new System.IntPtr(588)
 $test2 = System.DateTime.Now;
 $t = TimerInit()
-while $a[0]::int < 10000
-	$a[0]::int +=1
-	sin($a[0]::int)
-	$a[1] = $a[1]::string & ' ' & $a[0]::int
+while $a[0] < 10000
+	$a[0] = $a[0] + 1
+	sin($a[0])
+	$a[1] = $a[1] & ' ' & $a[0]
 wend
 alert(TimerDiff($t))
 alert(lol())
@@ -19,6 +19,6 @@ alert($test2)
 func lol()::string
 	return plop('kikoo')
 endfunc
-func plop($test::string = 46546, $lol::string = 5)::string
-	return 'plop ' & $test & ' ' & $lol
+func plop($test3::string = 46546, $lol::string = 5)::string
+	return 'plop ' & $test3 & ' ' & $lol
 endfunc

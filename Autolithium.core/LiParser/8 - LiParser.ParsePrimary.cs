@@ -33,23 +33,41 @@ namespace Autolithium.core
 
                 case '$':
                     szTemp = Getstr(Reg_AlphaNum);
+                    Type t;
 
                     if (szTemp == "")
                         throw new AutoitException(AutoitExceptionType.LEXER_BADFORMAT, LineNumber, Cursor);
-                    if (TryParseSubscript(out Ret))
+
+                    if (TryParseSubscript(out Ret)) szTemp += "[]";
+                    TryParseCast(out t);
+                    ConsumeWS();
+                    return VarAutExpression.VariableAccess(szTemp, null, Ret, t);
+
+                    /*if (TryParseSubscript(out Ret))
                     {
                         szTemp += "[]";
+                        Type t;
+                        TryParseCast(out t);
+                        return AutExpression.VariableAccess(szTemp, null, Ret, t);
                         if (!VarCompilerEngine.Get.ContainsKey(szTemp))
                         {
-                            var a = VarCompilerEngine.Createvar(szTemp);
-                            VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
-                            a.ActualType.Add(typeof(object[]));
-                            a.PolymorphList.Add(typeof(object[]), ParameterExpression.Parameter(typeof(object[]), szTemp));
-                            return Expression.Assign(VarCompilerEngine.Get[szTemp].ActualValue,
-                                Expression.NewArrayBounds(typeof(object), Ret));
+                            var F = GetVar(szTemp, this, null);
+                            if (F != null)
+                            {
+                                if (TryParseCast(out t)) return Expression.Convert(Expression.ArrayIndex(F, Ret), t);
+                                return Expression.ArrayIndex(F, Ret);
+                            }
+                            else
+                            {
+                                var a = VarCompilerEngine.Createvar(szTemp);
+                                VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
+                                a.ActualType.Add(typeof(object[]));
+                                a.PolymorphList.Add(typeof(object[]), ParameterExpression.Parameter(typeof(object[]), szTemp));
+                                return Expression.Assign(VarCompilerEngine.Get[szTemp].ActualValue,
+                                    Expression.NewArrayBounds(typeof(object), Ret));
+                            }
                         }
                         VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
-                        Type t;
                         if (TryParseCast(out t))
                             VarCompilerEngine.Get[szTemp].MyType.Push(t);
                         else VarCompilerEngine.Get[szTemp].MyType.Push(null);
@@ -57,10 +75,15 @@ namespace Autolithium.core
                     }
                     if (!VarCompilerEngine.Get.ContainsKey(szTemp))
                     {
-                        VarCompilerEngine.Createvar(szTemp);
-                        return Expression.Parameter(typeof(object), szTemp);
+                        var F = GetVar(szTemp, this, null);
+                        if (F != null) return F;
+                        else
+                        {
+                            VarCompilerEngine.Createvar(szTemp);
+                            return Expression.Parameter(typeof(object), szTemp);
+                        }
                     }
-                    else return VarCompilerEngine.Get[szTemp].ActualValue;
+                    else return VarCompilerEngine.Get[szTemp].ActualValue;*/
 
                 case '@':
                     szTemp = Getstr(Reg_AlphaNum);
@@ -122,6 +145,7 @@ namespace Autolithium.core
                 ConsumeWS();
                 var MName = Getstr(Reg_AlphaNum);
                 ConsumeWS();
+                Ret = (Ret is VarAutExpression) ? (Ret as VarAutExpression).Getter(null) : Ret;
                 var RetType = (Ret.Type.GetTypeInfo().IsGenericType && Ret.Type.GetGenericTypeDefinition() == typeof(Nullable<>) ?
                     Ret.Type.GetTypeInfo().GenericTypeArguments.First().GetTypeInfo() :
                     Ret.Type.GetTypeInfo());
