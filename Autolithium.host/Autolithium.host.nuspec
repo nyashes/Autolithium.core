@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package>
+  <metadata>
+    <id>Autolithium.compiler</id>
+    <version>0.0.1</version>
+    <authors>Alexandre THOUVENIN</authors>
+    <description>A script host for Autolihium</description>
+    <summary>Autolithium.host use Autolithium.core to host an Autolithium script in a .NET Assembly, you can use it in a windows phone 8 app or in a windows 8 app as well as in a desktop application (.NET 4.5)</summary>
+    <tags>Autoit Script dlr Autolithium Script-engine script-host</tags>
+    <language>en-US</language>
+    <dependencies>
+      <dependency id="Autolithium.core" version="0.0.1" />
+    </dependencies>
+  </metadata>
+</package>
