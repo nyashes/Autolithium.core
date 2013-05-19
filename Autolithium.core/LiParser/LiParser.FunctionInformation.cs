@@ -23,6 +23,7 @@ namespace Autolithium.core
         public List<ArgumentDefinition> MyArguments = new List<ArgumentDefinition>();
         public MethodInfo Body;
         public Type Delegate;
-        public FieldInfo DelegateField;
+        public Expression DelegateAccess;
+        public object AditionnalInfo;
     }
 }

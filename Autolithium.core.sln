@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.compiler", "Aut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.ion", "Autolithium.ion\Autolithium.ion.csproj", "{39E08B52-0B1D-45E9-97B6-DE4A727CF280}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.host", "Autolithium.host\Autolithium.host.csproj", "{CEBA3317-13A8-47D0-8054-F639567F64F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.host.test", "Autolithium.host.test\Autolithium.host.test.csproj", "{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +51,26 @@ Global
 		{39E08B52-0B1D-45E9-97B6-DE4A727CF280}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{39E08B52-0B1D-45E9-97B6-DE4A727CF280}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{39E08B52-0B1D-45E9-97B6-DE4A727CF280}.Release|x86.ActiveCfg = Release|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CEBA3317-13A8-47D0-8054-F639567F64F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -18,7 +18,8 @@ namespace Autolithium.core
             else
             {
                 var UseReal = Use as FunctionDefinition;
-                if (UseReal.DelegateField != null) return Expression.Invoke(Expression.MakeMemberAccess(null, UseReal.DelegateField), Params);
+                if (UseReal.DelegateAccess != null) return Expression.Invoke(UseReal.DelegateAccess, Params);
+                else if (UseReal.Body != null) return Expression.Call(UseReal.Body, Params);
                 else throw new NotImplementedException("Sorry, cannot call something else than a delegate field or a static method for now");
             }
         }

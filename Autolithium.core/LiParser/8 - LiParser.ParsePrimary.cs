@@ -38,10 +38,11 @@ namespace Autolithium.core
                     if (szTemp == "")
                         throw new AutoitException(AutoitExceptionType.LEXER_BADFORMAT, LineNumber, Cursor);
 
-                    if (TryParseSubscript(out Ret)) szTemp += "[]";
+                    List<Expression> SubScript = new List<Expression>();
+                    while (TryParseSubscript(out Ret)) { szTemp += "[]"; SubScript.Add(Ret); }
                     TryParseCast(out t);
                     ConsumeWS();
-                    return VarAutExpression.VariableAccess(szTemp, null, Ret, t);
+                    return VarAutExpression.VariableAccess(szTemp, null, t, SubScript.ToArray());
 
                     /*if (TryParseSubscript(out Ret))
                     {
@@ -116,7 +117,7 @@ namespace Autolithium.core
                     {
                         if (szTemp.Contains("."))
                         {
-                            var AType = Included.SelectMany(x => x.ExportedTypes).FirstOrDefault(
+                            var AType = Included.SelectMany(x => x.ExportedTypes).Concat(IncludedType) .FirstOrDefault(
                                 x => {
                                     var Nr = x.FullName.ToUpper().Split('.');
                                     return Nr.SequenceEqual(szTemp.ToUpper().Split('.').Take(Nr.Count()));

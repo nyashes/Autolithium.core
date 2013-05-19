@@ -13,7 +13,7 @@ namespace Autolithium.core
         protected DefineFuncDelegate DefineFunc;
         public void DefineFunction()
         {
-            var Matches = Script.Where(x => Regex.IsMatch(x, "^func(.*?)$", RegexOptions.IgnoreCase)).ToList();
+            var Matches = Script.Where(x => Regex.IsMatch(x, "^(?:\t| )*func(.*?)$", RegexOptions.IgnoreCase)).ToList();
             var Lines = Matches.Select(x =>
                 new
                 {
@@ -26,7 +26,7 @@ namespace Autolithium.core
                 this.GotoLine(L.Position);
                 Def = new FunctionDefinition();
                 Def.DefinitionSignature = L.Signature;
-
+                ConsumeWS();
                 if (Read(4).ToUpper() != "FUNC") throw new Exception("WHAT'S THE FU.U.U..U.U ....");
                 ConsumeWS();
                 Def.MyName = Getstr(Reg_AlphaNum);

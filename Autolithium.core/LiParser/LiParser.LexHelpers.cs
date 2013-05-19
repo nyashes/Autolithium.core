@@ -136,10 +136,10 @@ namespace Autolithium.core
             Cursor += Offset;
         }
 
-        public void NextLine()
+        public void NextLine(int N = 1)
         {
-            if (Script != null && LineNumber < Script.Length)
-                ScriptLine = Script[LineNumber++];
+            if (Script != null && LineNumber + N <= Script.Length)
+                ScriptLine = Script[(LineNumber+=N) - 1];
             else throw new IndexOutOfRangeException("Cannot move to next line in interactive mode or EOF reached");
             Cursor = 0;
         }

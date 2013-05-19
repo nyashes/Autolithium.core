@@ -59,19 +59,30 @@ namespace Autolithium.core
             {
                 ExpressionType = (IsGlobal == null) ? AutExpressionType.Variable : IsGlobal ?? true ? AutExpressionType.GlobalVariable : AutExpressionType.LocalVariable,
                 Name = Name,
-                Index = Index,
+                Index = Index == null ? null : new List<Expression>() {Index},
                 UnboxTo = UnboxTo
             };
             return n;
         }
-        
+        public static VarAutExpression VariableAccess(string Name, bool? IsGlobal = null, Type UnboxTo = null, params Expression[] Index)
+        {
+
+            var n = new VarAutExpression()
+            {
+                ExpressionType = (IsGlobal == null) ? AutExpressionType.Variable : IsGlobal ?? true ? AutExpressionType.GlobalVariable : AutExpressionType.LocalVariable,
+                Name = Name,
+                Index = Index.Length <= 0 ? null : Index.ToList(),
+                UnboxTo = UnboxTo
+            };
+            return n;
+        }
     }
 
     public class VarAutExpression : AutExpression
     {
         public string Name;
         public Type UnboxTo;
-        public Expression Index;
+        public List<Expression> Index;
         public bool? IsGlobal
         {
             get { return this.ExpressionType == AutExpressionType.GlobalVariable ? true : 

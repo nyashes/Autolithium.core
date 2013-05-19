@@ -16,7 +16,15 @@ namespace Autolithium.core
             if (Peek(4).ToUpper() == "THEN")
             {
                 Consume(4);
-                if (!EOL) return Expression.IfThen(Element, ParseBoolean());
+                ConsumeWS();
+                if (!EOL)
+                {
+                    var Exp = ParseBoolean();
+                    NextLine(); ConsumeWS();
+                    if (Peek(6).ToUpper() == "ELSEIF") { Consume(6); return Expression.IfThenElse(Element, Exp, ParseKeyword_IF(Keyword)); }
+                    else if (Peek(4).ToUpper() == "ELSE") { Consume(4); return Expression.IfThenElse(Element, Exp, ParseBoolean()); }
+                    else { NextLine(-1); return Expression.IfThen(Element, Exp); }
+                }
                 else if (!INTERCATIVE)
                 {
                     Expression Condition = Element;

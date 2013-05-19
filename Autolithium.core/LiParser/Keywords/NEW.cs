@@ -18,7 +18,7 @@ namespace Autolithium.core
             List<Expression> Arguments = ParseArgExpList();
             var Params = Arguments.Select(x => x.Type).ToList();
 
-            var Dest = Included.SelectMany(x => x.ExportedTypes).FirstOrDefault(x => x.FullName.ToUpper() == Name.ToUpper());
+            var Dest = Included.SelectMany(x => x.ExportedTypes).Concat(IncludedType).FirstOrDefault(x => x.FullName.ToUpper() == Name.ToUpper());
             if (Dest == default(Type)) throw new AutoitException(AutoitExceptionType.CLASSDOESNOTEXIXTS, LineNumber, Cursor, Name);
             var Candidates = Dest.GetTypeInfo().DeclaredConstructors.Where(x => x.GetParameters().Length == Params.Count);
             if (Candidates.Count() == 0) throw new AutoitException(AutoitExceptionType.CONSTRUCTORMISMATCH, LineNumber, Cursor);

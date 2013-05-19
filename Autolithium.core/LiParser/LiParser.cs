@@ -13,6 +13,7 @@ namespace Autolithium.core
     public partial class LiParser
     {
         public List<Assembly> Included = new List<Assembly>();
+        public List<Type> IncludedType = new List<Type>();
         public List<FunctionDefinition> DefinedFunctions = new List<FunctionDefinition>();
         //public AutoItVarCompilerEngine VarCompilerEngine;
 
@@ -24,7 +25,7 @@ namespace Autolithium.core
         }
         public LiParser(string Text) 
         {
-            Script = Text.Split(new string[] { "\r", "\n"}, StringSplitOptions.None);
+            Script = Text.Split(new string[] { "\r", "\n"}, StringSplitOptions.RemoveEmptyEntries);
             LineNumber = 1;
             ScriptLine = Script[0];
         }
@@ -36,14 +37,16 @@ namespace Autolithium.core
             GetVarDelegate G,
             SetVarDelegate S,
             CreateVarDelegate CR,
-            params Assembly[] Require)
+            IEnumerable<Assembly> RequireASM = null,
+            IEnumerable<Type> RequireType = null)
         {
             var l = new LiParser(
                     Regex.Replace(s, ";(.*)((\r\n)|(\r)|(\n))", "\r\n")
                     .Replace("\r\n", "\r")
             );
             
-            l.Included = Require.ToList();
+            l.Included = RequireASM != null ? RequireASM.ToList() : new List<Assembly>();
+            l.IncludedType = RequireType != null ? RequireType.ToList() : new List<Type>();
             l.DefineFunc = D;
             l.CompileFunc = C;
             l.GetVar = G;
@@ -51,16 +54,20 @@ namespace Autolithium.core
             l.CreateVar = CR;
             ExpressionTypeBeam.InitializeParameterEngine(G, S, CR);
             ExpressionTypeBeam.PushScope();
+
+            List<Expression> Output = l.DefineGlobal();
             l.DefineFunction();
             l.LiCompileFunction();
             
             l.Script = Regex.Replace(string.Join("\r", l.Script), "func(.*?)endfunc", "", RegexOptions.IgnoreCase | RegexOptions.Singleline).Split('\r');
-            l.GotoLine(0);
+            l.Script = l.Script.Where(x => !Regex.IsMatch(x, "^(\t| )*global(.*?)$", RegexOptions.IgnoreCase)).ToArray();
+            if (l.Script.Length > 0)
+                l.GotoLine(0);
 
             Expression ex;
-            List<Expression> Output = new List<Expression>();
-
-            if (l.ScriptLine != "" && !l.ScriptLine.StartsWith(";"))
+            
+            var cmd = AutExpression.VariableAccess("CmdLine", false, Expression.Constant(1, typeof(int)), typeof(string)).Generator();
+            if (l.ScriptLine != "" && !l.ScriptLine.StartsWith(";") && !l.EOF)
             {
                 ex = l.ParseBoolean();
                 if (ex is VarAutExpression) ex = (ex as VarAutExpression).Generator();
@@ -77,9 +84,10 @@ namespace Autolithium.core
                 Output.Add(ex);
             }
             if (Output.Count <= 0) return null;
-            BlockExpression e = Expression.Block(ExpressionTypeBeam.PopScope(), Output.ToArray().Where(x => x != null));
+            var SC = ExpressionTypeBeam.PopScope();
+            BlockExpression e = Expression.Block(SC.Where(x => x.Name != "CmdLine" || x.Type != typeof(string[])), Output.ToArray().Where(x => x != null));
             
-            return Expression.Lambda<Action<string[]>>(e, Expression.Parameter(typeof(string[]), "CmdLine"));
+            return Expression.Lambda<Action<string[]>>(e, SC.First(x => x.Name == "CmdLine" && x.Type == typeof(string[])));
         }
     }
 }

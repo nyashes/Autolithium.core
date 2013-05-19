@@ -34,6 +34,8 @@ namespace Autolithium.core
                 case "ENDWITH":
                 case "UNTIL":
                 case "ENDFUNC":
+                case "ELSE":
+                case "ELSEIF":
                     return AutExpression.EndOfBlock();
                 case "EXITLOOP":
                     ConsumeWS();
@@ -130,6 +132,7 @@ namespace Autolithium.core
             var Candidates = Obj == null ?
                     Included.SelectMany(x => x.ExportedTypes)
                     .Concat(new Type[] { typeof(Autcorlib) })
+                    .Concat(IncludedType)
                     .SelectMany(x => x.GetTypeInfo().DeclaredMethods
                     .Where(y => y.Name/*.ToUpper()*/ == Name.ToUpper() &&
                         y.GetParameters().Length >= ParamsRO.Count &&

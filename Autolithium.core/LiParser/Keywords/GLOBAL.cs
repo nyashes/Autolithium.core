@@ -23,15 +23,16 @@ namespace Autolithium.core
             if (Read() != "$") throw new AutoitException(AutoitExceptionType.EXPECTVAR, LineNumber, Cursor, Keyword);
             string Name = Getstr(Reg_AlphaNum);
             Type T = null;
-            Expression Subs;
-            if (TryParseSubscript(out Subs)) Name += "[]";
+            Expression Ret;
+            List<Expression> SubScripts = new List<Expression>();
+            while (TryParseSubscript(out Ret)) { Name += "[]"; SubScripts.Add(Ret); }
             if (!TryParseCast(out T)) T = typeof(object);
-            if (Subs != null) T = T.MakeArrayType();
+            if (SubScripts.Count > 0) T = T.MakeArrayType(SubScripts.Count);
             this.CreateVar(Name, T);
             ConsumeWS();
             if (T.IsArray)
             {
-                return SetVar(Name, Expression.NewArrayBounds(T.GetElementType(), Subs));
+                return SetVar(Name, Expression.NewArrayBounds(T.GetElementType(), SubScripts));
             }
             else if (Peek() == "=")
             {

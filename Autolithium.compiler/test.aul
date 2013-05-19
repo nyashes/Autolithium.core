@@ -1,24 +1,7 @@
-﻿global $a[2]::string
-$a[0] = 1
-$a[1] = ''
-global $test = new System.IntPtr(588)
-$test2 = System.DateTime.Now;
-$t = TimerInit()
-while $a[0] < 10000
-	$a[0] = $a[0] + 1
-	sin($a[0])
-	$a[1] = $a[1] & ' ' & $a[0]
-wend
-alert(TimerDiff($t))
-alert(lol())
-alert(plop(default, "kikoo"))
-alert(plop($t))
-alert("we are in " & $t.Year.ToString());
-alert($test)
-alert($test2)
-func lol()::string
-	return plop('kikoo')
-endfunc
-func plop($test3::string = 46546, $lol::string = 5)::string
-	return 'plop ' & $test3 & ' ' & $lol
-endfunc
+﻿$x = inputbox("", "entrez un nombre")
+if $x % 2 = 0 then 
+	alert("il est pair")
+else 
+	alert("il est impair")
+endif
+alert("son carré est " & $x^2)

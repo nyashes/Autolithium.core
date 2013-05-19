@@ -53,6 +53,7 @@
     <Compile Include="AutoitExceptionType.cs" />
     <None Include="AutoItVarCompiler.cs.old" />
     <Compile Include="BasicMacro.cs" />
+    <Compile Include="LiParser\LiParser.PrepareGlobals.cs" />
     <Compile Include="LiParser\Keywords\CALL.cs" />
     <Compile Include="LiParser\LiParser.CompileFunc.cs" />
     <Compile Include="LiParser\Keywords\GLOBAL.cs" />

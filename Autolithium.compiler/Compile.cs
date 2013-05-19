@@ -34,7 +34,8 @@ namespace Autolithium.compiler
                             FDef.MyArguments.Select(x => x.MyType).ToArray()
                         );
                     FDef.Delegate = M.CreateDelegateFor(FDef);
-                    FDef.DelegateField = T.DefineField("&=" + FDef.MyName, FDef.Delegate, FieldAttributes.Public | FieldAttributes.Static);
+                    FDef.AditionnalInfo = T.DefineField("&=" + FDef.MyName, FDef.Delegate, FieldAttributes.Public | FieldAttributes.Static);
+                    FDef.DelegateAccess = Expression.MakeMemberAccess(null, (MemberInfo)FDef.AditionnalInfo);
                     DefinedMethodInfo.Add(FDef);
                 },
                 (FDef, Lambda) =>

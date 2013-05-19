@@ -76,7 +76,7 @@ namespace Autolithium.core
             if (Exp != null) Global = Exp;
             Exp = Scope.Peek().FirstOrDefault(x => x.Name == E.Name && x.Type == T);
             if (Exp == null) Scope.Peek().Add((ParameterExpression)(Exp = Expression.Parameter(T, E.Name)));
-            
+            else if (Exp.Type == T) return Exp;
             var Ret = Expression.Block(T,
                 Expression.Assign(Exp, (Scope.Peek().LastOrDefault(x => x.Name == E.Name && OnDateType.Peek()[E].Contains(x.Type)) ?? Global).ConvertTo(Exp.Type)),
                 Exp);
