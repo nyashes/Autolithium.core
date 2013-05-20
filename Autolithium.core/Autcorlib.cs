@@ -324,6 +324,11 @@ namespace Autolithium.core
 
         #region Array management
         public static int UBOUND(object[] i) { return i.Length; }
+        public static int UBOUND(double[] i) { return i.Length; }
+        public static int UBOUND(int[] i) { return i.Length; }
+        public static int UBOUND(long[] i) { return i.Length; }
+        public static int UBOUND(bool[] i) { return i.Length; }
+        public static int UBOUND(string[] i) { return i.Length; }
         #endregion
     }
 }

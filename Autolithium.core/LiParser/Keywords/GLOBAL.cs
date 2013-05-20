@@ -58,7 +58,7 @@ namespace Autolithium.core
             Type T = null;
             Expression Ret;
             List<Expression> SubScripts = new List<Expression>();
-            while (TryParseSubscript(out Ret)) { Name += "[]"; SubScripts.Add(Ret); }
+            while (TryParseSubscript(out Ret)) { SubScripts.Add(Ret); }
             if (!TryParseCast(out T)) T = typeof(object);
             if (SubScripts.Count > 0) T = T.MakeArrayType(SubScripts.Count);
             this.CreateVar(Name, T);

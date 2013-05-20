@@ -72,7 +72,7 @@ namespace Autolithium.core
                         throw new AutoitException(AutoitExceptionType.LEXER_BADFORMAT, LineNumber, Cursor);
 
                     List<Expression> SubScript = new List<Expression>();
-                    while (TryParseSubscript(out Ret)) { szTemp += "[]"; SubScript.Add(Ret); }
+                    while (TryParseSubscript(out Ret)) { SubScript.Add(Ret); }
                     TryParseCast(out t);
                     ConsumeWS();
                     return VarAutExpression.VariableAccess(szTemp, null, t, SubScript.ToArray());

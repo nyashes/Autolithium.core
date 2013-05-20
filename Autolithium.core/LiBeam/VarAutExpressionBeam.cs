@@ -85,15 +85,20 @@ namespace Autolithium.core
         public static Expression Getter(this VarAutExpression E, Type T)
         {
             Expression Exp = null, Global = null;
+            if (E.Index != null) E.Index = E.Index.Select(x => x.ConvertTo(typeof(int))).ToList();
             if (E.IsGlobal ?? true)
             {
                 Exp = _Get(E.Name, E.Index != null ? null : T);
                 if (Exp != null && E.Index != null) return E.UnboxTo != null ?
                     (Expression)Expression.Convert(Expression.ArrayAccess(Exp, E.Index), E.UnboxTo).ConvertTo(T) :
                     (Expression)Expression.ArrayAccess(Exp, E.Index).ConvertTo(T);
-                else if (E.Index != null) return E.UnboxTo != null ?
-                    (Expression)Expression.Convert(Expression.ArrayAccess(_Get(E.Name, null), E.Index), E.UnboxTo).ConvertTo(T) :
-                    (Expression)Expression.ArrayAccess(_Get(E.Name, null), E.Index).ConvertTo(T);
+                else if (E.Index != null) try
+                    {
+                        return E.UnboxTo != null ?
+                            (Expression)Expression.Convert(Expression.ArrayAccess(_Get(E.Name, null), E.Index), E.UnboxTo).ConvertTo(T) :
+                            (Expression)Expression.ArrayAccess(_Get(E.Name, null), E.Index).ConvertTo(T);
+                    }
+                    catch { }
                 else if (Exp != null) return Exp;
                 else if (!GlobalCache) try {return _Get(E.Name, null).ConvertTo(T);} catch{}
             }
@@ -122,6 +127,7 @@ namespace Autolithium.core
             Expression Exp = null;
 
 
+            if (E.Index != null) E.Index = E.Index.Select(x => x.ConvertTo(typeof(int))).ToList();
 
             if (OnDateType.Peek().Any(x => x.Key.Name == E.Name))
                 OnDateType.Peek().First(x => x.Key.Name == E.Name).Value.Clear();
@@ -156,7 +162,9 @@ namespace Autolithium.core
         {
             ParameterExpression Exp;
             Expression Out = null;
-            
+
+            if (E.Index != null) E.Index = E.Index.Select(x => x.ConvertTo(typeof(int))).ToList();
+
             if (E.Index == null) Exp = Expression.Parameter(typeof(object), E.Name);
             else if (E.UnboxTo != null)
             {

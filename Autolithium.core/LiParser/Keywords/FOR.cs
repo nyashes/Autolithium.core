@@ -46,7 +46,7 @@ namespace Autolithium.core
         {
             Expression InitVal, LastVal, Step;
             string ForVarName;
-            ForVarName = (ParsePrimary() as ParameterExpression).Name;
+            ForVarName = (ParsePrimary() as VarAutExpression).Name;
             ConsumeWS();
             if (Peek(1).ToUpper() != "=") throw new AutoitException(AutoitExceptionType.FORWITHOUTTO, LineNumber, Cursor);
             Consume(); ConsumeWS();
@@ -61,7 +61,7 @@ namespace Autolithium.core
                 Consume(4); ConsumeWS();
                 Step = ParseBoolean().ConvertTo(InitVal.Type);
             }
-            else Step = Expression.Constant(1, InitVal.Type);
+            else Step = Expression.Constant(1, typeof(int)).ConvertTo(InitVal.Type);
             if (!INTERCATIVE)
             {
                 var @break = Expression.Label("break");

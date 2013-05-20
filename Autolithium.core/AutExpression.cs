@@ -122,6 +122,13 @@ namespace Autolithium.core
                 this.ExpressionType == AutExpressionType.LocalVariable ? false : 
                 (bool?)null; }
         }
+        public override Type Type
+        {
+            get
+            {
+                return this.Getter(null).Type;
+            }
+        }
 
         public VarAutExpression() : base() { }
 

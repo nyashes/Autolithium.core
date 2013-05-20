@@ -146,6 +146,7 @@ namespace Autolithium.core
                     if (Read() != "$") throw new AutoitException(AutoitExceptionType.EXPECTSYMBOL, LineNumber, Cursor, "$");
                     Ret.ArgName = Getstr(Reg_AlphaNum);
                     if (!TryParseCast(out Ret.MyType)) Ret.MyType = typeof(object);
+                    //if (Ret.MyType.IsArray) Ret.ArgName += string.Join("", Enumerable.Repeat("[]", Ret.MyType.GetArrayRank()));
                     ConsumeWS();
                     if (Peek() == "=")
                     {
@@ -183,13 +184,13 @@ namespace Autolithium.core
                 if (Func == default(MethodInfo))
                 {
                     var FuncInfo = DefinedFunctions.Where(x =>
-                        x.MyName.ToUpper() == Name.ToUpper() &&
-                        x.MyArguments.Count >= ParamsRO.Count)
+                        x.MyName.ToUpper() == Name.ToUpper() /*&&
+                        x.MyArguments.Count >= ParamsRO.Count*/)
                         .LastOrDefault();
 
                     if (FuncInfo == default(FunctionDefinition))
                         throw new AutoitException(AutoitExceptionType.NOFUNCMATCH, LineNumber, Cursor, Name + "(" + Params.Count + " parameters)");
-                    else
+                    else if (FuncInfo.MyArguments.Count >= ParamsRO.Count)
                     {
                         Params.AddRange(Enumerable.Repeat(Expression.Constant(null), FuncInfo.MyArguments.Count - ParamsRO.Count));
                         Params = Params.Zip(FuncInfo.MyArguments, (x, y) =>
@@ -197,8 +198,19 @@ namespace Autolithium.core
                             .ToList();
                         return FuncInfo;
                     }
+                    else
+                    {
+                        Params = Params.Take(FuncInfo.MyArguments.Count - 1)
+                        .Concat(new Expression[] { 
+                            Expression.NewArrayInit(
+                                FuncInfo.MyArguments.Last().MyType.GetElementType(), 
+                                Params.Skip(FuncInfo.MyArguments.Count - 1)
+                                .Select(x => x.ConvertTo(FuncInfo.MyArguments.Last().MyType.GetElementType()))) 
+                        }).ToList();
+                        return FuncInfo;
+                    }
                 }
-                else if (Func.GetParameters().Length > ParamsRO.Count)
+                else if (Func.GetParameters().Length >= ParamsRO.Count)
                 {
                     Params.AddRange(Enumerable.Repeat(Expression.Constant(null), Func.GetParameters().Length - ParamsRO.Count));
                     Params = Params.Zip(Func.GetParameters(), (x, y) =>
@@ -218,7 +230,13 @@ namespace Autolithium.core
                     return Func;
                 }
             }
-            else return Func;
+            else
+            {
+                Params = Params.Zip(Func.GetParameters(), (x, y) =>
+                        x.ConvertTo(y.ParameterType))
+                        .ToList();
+                return Func;
+            }
         }
         private dynamic SelectOverload(string Name, ref List<Expression> Params, Expression Obj)
         {

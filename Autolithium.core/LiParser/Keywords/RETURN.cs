@@ -45,7 +45,7 @@ namespace Autolithium.core
         private Expression ParseKeyword_RETURN(string Keyword)
         {
             return Expression.Block(Contextual.Peek().Type, 
-                VarAutExpression.VariableAccess("Return-store").Setter(ParseBoolean(false)).ConvertTo(Contextual.Peek().Type)
+                VarAutExpression.VariableAccess("Return-store").Setter(ParseBoolean(false).ConvertTo(Contextual.Peek().Type))
                 , Contextual.Peek());
             /*VarSynchronisation.Add();
             return Contextual.Peek();*/

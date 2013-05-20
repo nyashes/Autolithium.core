@@ -60,7 +60,7 @@ namespace Autolithium.core
                 ExpressionTypeBeam.PushScope();
                 List<Expression> VarSynchronisation = new List<Expression>();
                 VarSynchronisation.Add(VarAutExpression.VariableAccess("Return-store", false)
-                    .Setter(Expression.Constant(null, L.FDef.ReturnType)));
+                    .Setter(Expression.Constant(L.FDef.ReturnType.DefaultValue(), L.FDef.ReturnType)));
                 VarSynchronisation.AddRange(
                     L.FDef.MyArguments.Select(x =>
                     {
