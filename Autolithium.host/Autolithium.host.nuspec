@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>Autolithium.host</id>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
     <authors>Alexandre THOUVENIN</authors>
     <description>A script host for Autolihium https://github.com/nem-e5i5/Autolithium.core</description>
     <summary>Autolithium.host use Autolithium.core to host an Autolithium script in a .NET Assembly, you can use it in a windows phone 8 app or in a windows 8 app as well as in a desktop application (.NET 4.5)</summary>
     <tags>Autoit Script dlr Autolithium Script-engine script-host</tags>
     <language>en-US</language>
     <dependencies>
-      <dependency id="Autolithium.core" version="0.0.1" />
+      <dependency id="Autolithium.core" version="0.0.3" />
     </dependencies>
   </metadata>
 </package>
