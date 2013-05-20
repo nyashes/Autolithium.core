@@ -134,6 +134,7 @@ namespace Autolithium.core
                         t = typeof(object);
                         break;
                 }
+                if (Peek() == "[") { Consume(); ConsumeWS(); if (Peek() == "]") { Consume(); t = t.MakeArrayType(); } }
                 return true;
             }
                 
@@ -185,7 +186,7 @@ namespace Autolithium.core
         }
 
         public bool EOL { get { return Cursor >= ScriptLine.Length; } }
-        public bool EOF { get { return (Script == null || LineNumber >= Script.Length); } }
+        public bool EOF { get { return (Script == null || (LineNumber >= Script.Length && EOL)); } }
         public bool INTERCATIVE { get { return Script == null || Script.Length <= 1; } }
     }
 }

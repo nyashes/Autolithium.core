@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package>
+  <metadata>
+    <id>Autolithium.ion</id>
+    <version>0.0.1</version>
+    <authors>Alexandre THOUVENIN</authors>
+    <description>A windows library for Autolihium https://github.com/nem-e5i5/Autolithium.core</description>
+    <summary>Designed to contains specific function for autolithium only available on windows</summary>
+    <tags>Autoit Script dlr Autolithium Script-engine windows</tags>
+    <language>en-US</language>
+    <dependencies>
+      <dependency id="Autolithium.core" version="0.0.1" />
+    </dependencies>
+  </metadata>
+</package>

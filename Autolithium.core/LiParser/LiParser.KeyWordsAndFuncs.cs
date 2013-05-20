@@ -168,10 +168,10 @@ namespace Autolithium.core
                     .Concat(IncludedType)
                     .SelectMany(x => x.GetTypeInfo().DeclaredMethods
                     .Where(y => y.Name/*.ToUpper()*/ == Name.ToUpper() &&
-                        y.GetParameters().Length >= ParamsRO.Count &&
+                        /*y.GetParameters().Length >= ParamsRO.Count &&*/
                         y.IsStatic))
                         : Obj.DeclaredMethods.Where(y => y.Name.ToUpper() == Name.ToUpper() &&
-                            y.GetParameters().Length >= ParamsRO.Count &&
+                            /*y.GetParameters().Length >= ParamsRO.Count &&*/
                             !y.IsStatic);
 
             var Func = Candidates.LastOrDefault(x => x.GetParameters()
@@ -198,12 +198,23 @@ namespace Autolithium.core
                         return FuncInfo;
                     }
                 }
-                else
+                else if (Func.GetParameters().Length > ParamsRO.Count)
                 {
                     Params.AddRange(Enumerable.Repeat(Expression.Constant(null), Func.GetParameters().Length - ParamsRO.Count));
                     Params = Params.Zip(Func.GetParameters(), (x, y) =>
                         x.ConvertTo(y.ParameterType))
                         .ToList();
+                    return Func;
+                }
+                else
+                {
+                    Params = Params.Take(Func.GetParameters().Length - 1)
+                        .Concat(new Expression[] { 
+                            Expression.NewArrayInit(
+                                Func.GetParameters().Last().ParameterType.GetElementType(), 
+                                Params.Skip(Func.GetParameters().Length - 1)
+                                .Select(x => x.ConvertTo(Func.GetParameters().Last().ParameterType.GetElementType()))) 
+                        }).ToList();
                     return Func;
                 }
             }

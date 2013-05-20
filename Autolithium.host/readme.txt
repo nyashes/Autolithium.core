@@ -1,0 +1,1 @@
+﻿Autolithium.host use Autolithium.core to host an Autolithium script in a .NET Assembly, you can use it in a windows phone 8 app or in a windows 8 app as well as in a desktop application (.NET 4.5)

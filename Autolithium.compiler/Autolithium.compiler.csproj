@@ -51,7 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Autolithium.compiler.nuspec" />
+    <None Include="Autolithium.compiler.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="test.aul">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -65,6 +67,9 @@
       <Project>{39e08b52-0b1d-45e9-97b6-de4a727cf280}</Project>
       <Name>Autolithium.ion</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

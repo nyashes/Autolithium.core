@@ -1,0 +1,1 @@
+﻿Designed to contains specific function for autolithium only available on windows

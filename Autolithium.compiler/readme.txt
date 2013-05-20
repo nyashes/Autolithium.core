@@ -1,0 +1,2 @@
+﻿Autolithium.compiler use Autolithium.core to compile an Autolithium script to a .NET Assembly, not something that will compile the script at run time but realy compile it at compile time
+    Note : the compiler cannot be used from a windows phone or a windows store app BUT maybe one day I will be capable of making this compiler compile to those plateform

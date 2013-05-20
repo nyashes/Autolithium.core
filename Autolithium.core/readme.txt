@@ -1,0 +1,1 @@
+﻿Autolithium.core contains an autoit-like .NET 4.5/Windows phone 8/Windows store compiler that can be extended to compile a script to a .NET assembly or to a script host to extend your application, see Autolithium.compiler and Autolithium.host for more informations about that

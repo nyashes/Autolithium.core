@@ -193,6 +193,93 @@ namespace Autolithium.core
             double Dummy;
             return double.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out Dummy);
         }
+        public static bool STRINGISINT(string s)
+        {
+            int Dummy;
+            return int.TryParse(s, out Dummy);
+        }
+        public static bool STRINGISLOWER(string s)
+        {
+            return s.ToLower() == s;
+        }
+        public static bool STRINGISSPACE(string s)
+        {
+            throw new NotImplementedException();
+        }
+        public static bool STRINGISUPPER(string s)
+        {
+            return s.ToUpper() == s;
+        }
+        public static bool STRINGISXDIGIT(string s)
+        {
+            throw new NotImplementedException();
+        }
+        public static string STRINGLEFT(string s, int count)
+        {
+            return s.Substring(0, count);
+        }
+        public static int STRINGLEN(string s)
+        {
+            return s.Length;
+        }
+        public static string STRINGLOWER(string s)
+        {
+            return s.ToLower();
+        }
+        public static string STRINGMID(string s)
+        {
+            throw new NotImplementedException();
+        }
+        public static object STRINGREGEXP(string str, string Patern, int Option)
+        {
+            throw new NotImplementedException();
+        }
+        public static string STRINGREGEXPREPLACE(string str, string Patern, int Option)
+        {
+            throw new NotImplementedException();
+        }
+        public static string STRINGREPLACE(string Source, string From, string To)
+        {
+            return Source.Replace(From, To);
+        }
+        public static string STRINGRIGHT(string s, int count)
+        {
+            return s.Substring(s.Length - count);
+        }
+        public static string[] STRINGSPLIT(string s, string sep, int option)
+        {
+            var sp = s.Split(new string[] { sep }, StringSplitOptions.None);
+            return new string[] { sp.Length.ToString() }.Concat(sp).ToArray();
+        }
+        public static string STRINGSTRIPCR(string s)
+        {
+            throw new NotImplementedException();
+        }
+        public static string STRINGSTRIPWS(string s)
+        {
+            throw new NotImplementedException();
+        }
+        public static string[] STRINGTOASCIIARRAY(string s)
+        {
+            return s.ToCharArray().Cast<string>().ToArray();
+        }
+        public static string STRINGTOBINARY(string s)
+        {
+            throw new NotImplementedException();
+        }
+        public static string STRINGTRIMLEFT(string s, int count)
+        {
+            return s.Substring(count);
+        }
+        public static string STRINGTRIMRIGHT(string s, int count)
+        {
+            return s.Substring(0, s.Length - count);
+        }
+        public static string STRINGUPPER(string s)
+        {
+            return s.ToUpper();
+        }
+
         public static string STRINGFORMAT(string s, params object[] args)
         {
             return string.Format(s, args);

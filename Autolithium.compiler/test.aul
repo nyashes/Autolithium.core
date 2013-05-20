@@ -1,7 +1,1 @@
-﻿$x = inputbox("", "entrez un nombre")
-if $x % 2 = 0 then 
-	alert("il est pair")
-else 
-	alert("il est impair")
-endif
-alert("son carré est " & $x^2)
+﻿alert(stringformat("salut {0} tu as {1} ans", "alex", 5))
