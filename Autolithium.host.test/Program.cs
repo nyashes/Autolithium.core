@@ -13,12 +13,12 @@ namespace Autolithium.host.test
             //Autolithium.host.Host.UseAssembly(Assembly.GetAssembly(typeof(ScriptExt)));
             Autolithium.host.Host.UseType(typeof(ScriptExt));
             Autolithium.host.Host.CreateScript("Test",
-@"
-global $lol = 1
-func t()
-write('hello ' & $lol)
-Pause();
-endfunc");
+                @"
+                global $lol = 1
+                func t()
+                write('hello ' & $lol)
+                Pause();
+                endfunc");
             Autolithium.host.Host.Scripts["Test"].Main(args);
             Autolithium.host.Host.Scripts["Test"].Functions["t"].DynamicInvoke();
             Autolithium.host.Host.Scripts["Test"].GlobalVars["lol"] = "blahhhhh!!!";

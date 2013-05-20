@@ -61,6 +61,10 @@
       <Project>{6ffe8048-3f6b-47e5-834b-23df43713e1b}</Project>
       <Name>Autolithium.core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Autolithium.ion\Autolithium.ion.csproj">
+      <Project>{39e08b52-0b1d-45e9-97b6-de4a727cf280}</Project>
+      <Name>Autolithium.ion</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

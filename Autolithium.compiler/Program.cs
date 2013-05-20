@@ -70,7 +70,7 @@ namespace Autolithium.compiler
             switch(args[2].ToLower())
             {
                 case "win":
-                    Include.Add(ASMInclude.IncludeDLL(dm, @"C:\Users\nem-e_000\Documents\Visual Studio 2012\Projects\Autolithium.core\Autolithium.ion\bin\Debug\Autolithium.ion.dll", "dyn_type"));
+                    Include.Add(ASMInclude.IncludeDLL(dm, @"Autolithium.ion.dll", "dyn_type"));
                     Include.Add(ASMInclude.RequireNetFXASM("System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"));
                     Include.Add(ASMInclude.RequireNetFXASM("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"));
                     break;           
