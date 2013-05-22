@@ -60,6 +60,7 @@ namespace Autolithium.core
                 case "NEW": return ParseKeyword_NEW(Keyword);
                 case "DEFAULT": return Expression.Constant(null);
                 case "GLOBAL": return ParseKeyword_GLOBAL(Keyword);
+                case "DEFINE": return ParseKeyword_DEFINE(Keyword);
                 case "ENDIF":
                 case "NEXT":
                 case "END":

@@ -175,7 +175,9 @@ namespace Autolithium.core
             if (Script != null && LineNumber + N <= Script.Length)
                 ScriptLine = Script[(LineNumber+=N) - 1];
             else throw new IndexOutOfRangeException("Cannot move to next line in interactive mode or EOF reached");
+
             Cursor = 0;
+            PutMacro();
         }
         public void GotoLine(int L)
         {
@@ -183,6 +185,35 @@ namespace Autolithium.core
                 ScriptLine = Script[(LineNumber = L + 1) - 1];
             else throw new IndexOutOfRangeException("Cannot move to a line in interactive mode or EOF reached");
             Cursor = 0;
+            PutMacro();
+        }
+        private void PutMacro()
+        {
+            ConsumeWS();
+            if (Peek(6).ToUpper() != "DEFINE") do
+            {
+                bool InString = false;
+                string LastQuote = "";
+                while ((Peek() != "@" || InString) && !EOL)
+                {
+                    if (InString) InString = LastQuote != Peek();
+                    else InString = (LastQuote = Peek()) == "\"" || LastQuote == "'";
+                    Consume();
+                }
+                if (EOL) break;
+                var CPos = Cursor;
+                Consume();
+                string szTemp = Getstr(Reg_AlphaNum);
+                if (Macro.ContainsKey(szTemp.ToUpper()) || BasicMacro.ConstantMacro.ContainsKey(szTemp.ToUpper()))
+                {
+                    string C = "";
+                    if (BasicMacro.ConstantMacro.ContainsKey(szTemp.ToUpper())) C = BasicMacro.ConstantMacro[szTemp.ToUpper()];
+                    else if (Macro.ContainsKey(szTemp.ToUpper())) C = Macro[szTemp.ToUpper()];
+                    ScriptLine = ScriptLine.Substring(0, CPos) + C + ScriptLine.Substring(CPos + szTemp.Length + 1);
+                    Seek(CPos);
+                }
+            } while (!EOL);
+            Seek();
         }
 
         public bool EOL { get { return Cursor >= ScriptLine.Length; } }

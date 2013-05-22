@@ -34,31 +34,27 @@ knowledge of the CeCILL-C license and that you accept its terms.*/
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Autolithium.core
 {
-    public static class BasicMacro
+    public partial class LiParser
     {
-        public static MethodInfo GetMacroInfo = typeof(BasicMacro).GetRuntimeMethod("GetMacro", new Type[] {typeof(string)});
-        public static readonly Dictionary<string, string> ConstantMacro = new Dictionary<string, string>() 
-        { 
-            { "CRLF", "\"\r\n\"" } ,
-            { "CR", "\"\r\"" },
-            { "LF", "\"\n\"" },
-        };
-        public static object GetMacro(string Name)
+        private Dictionary<string, string> Macro = new Dictionary<string, string>();
+
+        private Expression ParseKeyword_DEFINE(string Keyword)
         {
-            Name = Name.ToUpper();
-            switch (Name)
-            {
-                case "CRLF": return "\r\n";
-                case "CR": return "\r";
-                case "LF": return "\n";
-            }
+            ConsumeWS();
+            if (Read() != "@") throw new AutoitException(AutoitExceptionType.EXPECTSYMBOL, LineNumber, Cursor, "@");
+            var N = Getstr(Reg_AlphaNum);
+            ConsumeWS();
+            Macro.Add(N.ToUpper(), Getstr("."));
             return null;
+            /*VarSynchronisation.Add();
+            return Contextual.Peek();*/
+            
         }
     }
 }

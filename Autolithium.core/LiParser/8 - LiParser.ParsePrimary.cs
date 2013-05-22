@@ -77,49 +77,8 @@ namespace Autolithium.core
                     ConsumeWS();
                     return VarAutExpression.VariableAccess(szTemp, null, t, SubScript.ToArray());
 
-                    /*if (TryParseSubscript(out Ret))
-                    {
-                        szTemp += "[]";
-                        Type t;
-                        TryParseCast(out t);
-                        return AutExpression.VariableAccess(szTemp, null, Ret, t);
-                        if (!VarCompilerEngine.Get.ContainsKey(szTemp))
-                        {
-                            var F = GetVar(szTemp, this, null);
-                            if (F != null)
-                            {
-                                if (TryParseCast(out t)) return Expression.Convert(Expression.ArrayIndex(F, Ret), t);
-                                return Expression.ArrayIndex(F, Ret);
-                            }
-                            else
-                            {
-                                var a = VarCompilerEngine.Createvar(szTemp);
-                                VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
-                                a.ActualType.Add(typeof(object[]));
-                                a.PolymorphList.Add(typeof(object[]), ParameterExpression.Parameter(typeof(object[]), szTemp));
-                                return Expression.Assign(VarCompilerEngine.Get[szTemp].ActualValue,
-                                    Expression.NewArrayBounds(typeof(object), Ret));
-                            }
-                        }
-                        VarCompilerEngine.Get[szTemp].ArrayIndex.Push(Ret);
-                        if (TryParseCast(out t))
-                            VarCompilerEngine.Get[szTemp].MyType.Push(t);
-                        else VarCompilerEngine.Get[szTemp].MyType.Push(null);
-                        return Expression.Parameter(typeof(object[]), szTemp);
-                    }
-                    if (!VarCompilerEngine.Get.ContainsKey(szTemp))
-                    {
-                        var F = GetVar(szTemp, this, null);
-                        if (F != null) return F;
-                        else
-                        {
-                            VarCompilerEngine.Createvar(szTemp);
-                            return Expression.Parameter(typeof(object), szTemp);
-                        }
-                    }
-                    else return VarCompilerEngine.Get[szTemp].ActualValue;*/
-
                 case '@':
+                    var CPos = Cursor - 1;
                     szTemp = Getstr(Reg_AlphaNum);
 
                     if (szTemp == "")

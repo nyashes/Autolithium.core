@@ -1,9 +1,3 @@
-﻿func sum($n::real[])::real
-	$ret = 0
-	for $i = 0 to ubound($n) - 1
-		$ret += $n[$i]
-	next
-	return $ret
-endfunc
-
-alert("1 + 2 + 3 + 4 + 5 = " & sum(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+﻿define @lol alert("lol" & 
+define @endlol )
+@lol @crlf @endlol
