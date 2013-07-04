@@ -1,3 +1,16 @@
-﻿define @lol alert("lol" & 
-define @endlol )
-@lol @crlf @endlol
+﻿for $i = 0 to 30 step 3
+if $i % 2 = 0 then alert($i & " est pair")
+else alert($i & " est impair")
+next
+Test()
+Plop("lol")
+alert($z)
+
+func Test()
+alert("lol")
+endfunc
+
+func Plop($x::string)
+global $z = $x
+alert("prout " & $x)
+endfunc

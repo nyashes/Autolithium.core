@@ -72,6 +72,7 @@ namespace Autolithium.core
                 SeekRelative(-1);
                 break;
             } while (!EOL);
+            if (C1 is VarAutExpression) C1 = (C1 as VarAutExpression).Getter(null);
             return C1;
         }
     }

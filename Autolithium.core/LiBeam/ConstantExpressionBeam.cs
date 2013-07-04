@@ -45,6 +45,7 @@ namespace Autolithium.core
     {
         public static Expression ConvertTo(this ConstantExpression E, Type T)
         {
+            if (E.Type == T) return E;
             if (T == typeof(string)) //Convert to string ?
                 return Expression.Constant(Convert.ToString(E.Value, CultureInfo.InvariantCulture), T);
             /*else if (NumericType.Contains(T)) //Convert to number ?

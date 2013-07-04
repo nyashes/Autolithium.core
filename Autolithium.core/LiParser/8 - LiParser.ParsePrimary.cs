@@ -146,8 +146,8 @@ namespace Autolithium.core
                 if (Peek() == "(")
                 {
                     var Args = ParseArgExpList();
-                    var Method = (MethodInfo)SelectOverload(MName, ref Args, RetType);
-                    Ret = Expression.Call(RetVal, Method, Args);
+                    /*var Method = (MethodInfo)SelectOverload(MName, ref Args, RetType);
+                    Ret = Expression.Call(RetVal, Method, Args);*/
                 }
                 else Ret = Expression.MakeMemberAccess(RetVal, RetType.DeclaredMembers.First(x => x.Name == MName));
                 ConsumeWS();

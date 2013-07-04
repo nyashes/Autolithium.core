@@ -9,7 +9,7 @@
     <tags>Autoit Script dlr Autolithium Script-engine script-host</tags>
     <language>en-US</language>
     <dependencies>
-      <dependency id="Autolithium.core" version="0.0.3" />
+      <dependency id="Autolithium.core" version="0.0.4" />
     </dependencies>
   </metadata>
 </package>

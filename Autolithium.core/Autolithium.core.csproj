@@ -36,6 +36,13 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
     <Compile Include="AutExpression.cs" />
     <Compile Include="LiBeam\ConstantExpressionBeam.cs" />
+    <Compile Include="LiBeam\1 - IScope.cs" />
+    <Compile Include="LiBeam\2 - VScope.cs" />
+    <Compile Include="LiBeam\3 - LocalScope.cs" />
+    <Compile Include="LiBeam\4 - BlockScope.cs" />
+    <Compile Include="LiBeam\5 - ClrScope.cs" />
+    <Compile Include="LiBeam\0 - Scope.cs" />
+    <Compile Include="LiBeam\~ - Meta.cs" />
     <Compile Include="LiBeam\VarAutExpressionBeam.cs" />
     <Compile Include="LiBeam\ExpressionBeam.cs" />
     <Compile Include="LiBeam\TypeBeam.cs" />
@@ -53,6 +60,7 @@
     <Compile Include="AutoitExceptionType.cs" />
     <None Include="AutoItVarCompiler.cs.old" />
     <Compile Include="BasicMacro.cs" />
+    <Compile Include="LiParser\0 - LiParser.ParseBlock.cs" />
     <Compile Include="LiParser\Keywords\DEFINE.cs" />
     <Compile Include="LiParser\LiParser.PrepareGlobals.cs" />
     <Compile Include="LiParser\Keywords\CALL.cs" />

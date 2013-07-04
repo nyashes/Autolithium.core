@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.host", "Autolit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.host.test", "Autolithium.host.test\Autolithium.host.test.csproj", "{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autolithium.ion.APITest", "Autolithium.ion.APITest\Autolithium.ion.APITest.csproj", "{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,16 @@ Global
 		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6CA9E0C4-E636-4E2E-80BA-D79D4B9CC650}.Release|x86.ActiveCfg = Release|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0AC95892-CAEA-4C7A-9A7F-921D3C86A749}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

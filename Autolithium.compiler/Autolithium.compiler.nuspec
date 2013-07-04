@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Autolithium.compiler</id>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <authors>Alexandre THOUVENIN</authors>
     <description>A command line compiler for Autolihium https://github.com/nem-e5i5/Autolithium.core</description>
     <summary>Autolithium.compiler use Autolithium.core to compile an Autolithium script to a .NET Assembly, not something that will compile the script at run time but realy compile it at compile time
@@ -10,8 +10,8 @@
     <tags>Autoit Script dlr Autolithium Script-engine compiler</tags>
     <language>en-US</language>
     <dependencies>
-      <dependency id="Autolithium.core" version="0.0.3" />
-      <dependency id="Autolithium.ion" version="0.0.3" />
+      <dependency id="Autolithium.core" version="0.0.4" />
+      <dependency id="Autolithium.ion" version="0.0.4" />
     </dependencies>
   </metadata>
 </package>

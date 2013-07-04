@@ -49,14 +49,17 @@ namespace Autolithium.core
             { "CR", "\"\r\"" },
             { "LF", "\"\n\"" },
         };
+
+        internal static int @ERROR = 0;
+        internal static int @EXTENDED = 0;
         public static object GetMacro(string Name)
         {
             Name = Name.ToUpper();
             switch (Name)
             {
-                case "CRLF": return "\r\n";
-                case "CR": return "\r";
-                case "LF": return "\n";
+                case "ERROR": return @ERROR;
+                case "EXTENDED": return @EXTENDED;
+                //case "LF": return "\n";
             }
             return null;
         }

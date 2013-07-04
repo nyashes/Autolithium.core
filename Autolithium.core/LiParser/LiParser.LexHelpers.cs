@@ -131,7 +131,11 @@ namespace Autolithium.core
                         t = typeof(bool);
                         break;
                     default:
-                        t = typeof(object);
+                        var str = s + Getstr(Reg_Any);
+                        var g = this.Included.SelectMany(x => x.ExportedTypes)
+                            .Concat(this.IncludedType)
+                            .FirstOrDefault(x => x.FullName.ToUpper() == str.ToUpper());
+                        t = g ?? typeof(object);
                         break;
                 }
                 if (Peek() == "[") { Consume(); ConsumeWS(); if (Peek() == "]") { Consume(); t = t.MakeArrayType(); } }

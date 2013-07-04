@@ -32,6 +32,7 @@ The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.*/
 
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -41,44 +42,60 @@ using System.Threading.Tasks;
 
 namespace Autolithium.core
 {
-    public delegate void CompileFuncDelegate(FunctionDefinition FDef, LambdaExpression Body);
+    //public delegate void CompileFuncDelegate(FunctionDefinition FDef, LambdaExpression Body);
     public partial class LiParser
     {
-        protected CompileFuncDelegate CompileFunc;
+        //protected CompileFuncDelegate CompileFunc;
         public void LiCompileFunction()
         {
-            var Matches = Script.Where(x => Regex.IsMatch(x, "^func(.*?)$", RegexOptions.IgnoreCase)).ToList();
-            var Lines = Matches.Select(x => 
-                new { 
-                    Position = Array.IndexOf(Script, x), 
-                    FDef = DefinedFunctions.First(y => y.DefinitionSignature == x.GetHashCode()) 
-                });
+            foreach (var ID in FunctionIdentifiers)
+            {
+                GotoLine(ID.Key);
+                var FMeta = GetFunctionMeta();
+                NextLine();
+                var Ret = Expression.Label();
+                Contextual.Push(Expression.Goto(Ret, FMeta.ReturnType));
+                ExpressionTypeBeam.PushScope();
+                foreach (var arg in FMeta.Parameters) ExpressionTypeBeam.CurrentScope.SetVarCached(arg.Name, Expression.Constant(arg.ArgType.DefaultValue(), arg.ArgType), false);
+                ExpressionTypeBeam.CurrentScope.DefineFunc(ID.Value, Expression.Lambda(ParseBlock(), ExpressionTypeBeam.PopScope()));
+            }
+            /*
+            return;
+            var Matches = Script.Where(x => Regex.IsMatch(x, "^(?:\t| )*func(.*?)$", RegexOptions.IgnoreCase)).ToList();
+            var Lines = Matches.Select(x => Array.IndexOf(Script, x));
             List<ParameterExpression> Params = new List<ParameterExpression>();
             foreach (var L in Lines)
             {
-                GotoLine(L.Position);
+                GotoLine(L);
+                var FMeta = GetFunctionMeta();
                 ExpressionTypeBeam.PushScope();
-                List<Expression> VarSynchronisation = new List<Expression>();
-                VarSynchronisation.Add(VarAutExpression.VariableAccess("Return-store", false)
-                    .Setter(Expression.Constant(L.FDef.ReturnType.DefaultValue(), L.FDef.ReturnType)));
-                VarSynchronisation.AddRange(
-                    L.FDef.MyArguments.Select(x =>
+                List<Expression> PreFunction = new List<Expression>();
+
+                var MyFunc = ExpressionTypeBeam.CurrentScope.Parent.ScopeFunctions.First(x => x.Name == FMeta.Name && x.Parameters.SequenceEqual(FMeta.Parameters) && x.ReturnType == FMeta.ReturnType);
+
+                PreFunction.Add(VarAutExpression.VariableAccess("Return-store", false)
+                    .Setter(Expression.Constant(FMeta.ReturnType.DefaultValue(), FMeta.ReturnType)));
+                PreFunction.AddRange(
+                    MyFunc.Parameters.Select(x =>
                     {
-                        Params.Add(Expression.Parameter(x.MyType));
+                        var PType = x.GetTypeInfo().IsValueType ? typeof(Nullable<>).MakeGenericType(x) : x;
+                        Params.Add(Expression.Parameter(PType));
                         return VarAutExpression.VariableAccess(x.ArgName).Setter(
-                            Expression.Coalesce(Params.Last(), x.DefaultValue.ConvertTo(Params.Last().Type))
+                            Expression.Coalesce(Params.Last(), x.DefaultValue().ConvertTo(x))
                         );
                     })
                 );
                 var Ret = Expression.Label();
-                Contextual.Push(Expression.Goto(Ret, L.FDef.ReturnType));
+                Contextual.Push(Expression.Goto(Ret, FMeta.ReturnType));
                 
                 var Block = ParseBlock();
-                Block = VarSynchronisation.Concat(Block).ToList();
+                
                 Block.Add(Expression.Label(Ret));
                 Block.Add(VarAutExpression.VariableAccess("Return-store", false).Getter(L.FDef.ReturnType));
-                CompileFunc(L.FDef, Expression.Lambda(Expression.Block(ExpressionTypeBeam.PopScope(), Block), Params));
-            }
+                ExpressionTypeBeam.CurrentScope.DefineFunc(, Expression.Lambda(Expression.Block(ExpressionTypeBeam.PopScope(), Block), Params));
+                Block.Clear();
+                Params.Clear();
+            }*/
         }
     }
 }

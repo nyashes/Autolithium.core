@@ -2,14 +2,14 @@
 <package>
   <metadata>
     <id>Autolithium.ion</id>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <authors>Alexandre THOUVENIN</authors>
     <description>A windows library for Autolihium https://github.com/nem-e5i5/Autolithium.core</description>
     <summary>Designed to contains specific function for autolithium only available on windows</summary>
     <tags>Autoit Script dlr Autolithium Script-engine windows</tags>
     <language>en-US</language>
     <dependencies>
-      <dependency id="Autolithium.core" version="0.0.3" />
+      <dependency id="Autolithium.core" version="0.0.4" />
     </dependencies>
   </metadata>
 </package>

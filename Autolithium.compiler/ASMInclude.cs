@@ -122,22 +122,22 @@ namespace Autolithium.compiler
             return Ret;
 
         }
-        public static void GenerateDelegateBinder(MethodBuilder Dest, IEnumerable<FunctionDefinition> D)
+        public static void GenerateDelegateBinder(MethodBuilder Dest, IEnumerable<FunctionMeta> D)
         {
             var IL = Dest.GetILGenerator();
             var FDefine = typeof(Autcorlib).GetTypeInfo().DeclaredMethods.First(x => x.Name == "FUNCTIONDEFINE");
             var FReg = typeof(Autcorlib).GetTypeInfo().DeclaredMethods.First(x => x.Name == "FUNCTIONREGISTER");
             foreach (var f in D)
             {
-                IL.Emit(OpCodes.Ldstr, f.MyName);
+                IL.Emit(OpCodes.Ldstr, f.Name);
                 IL.EmitCall(OpCodes.Call, FDefine, null);
-                IL.Emit(OpCodes.Ldstr, f.MyName);
+                IL.Emit(OpCodes.Ldstr, f.Name);
                 IL.Emit(OpCodes.Ldnull);
-                IL.Emit(OpCodes.Ldftn, f.Body);
+                IL.Emit(OpCodes.Ldftn, ((AssemblyFunction)f.Information).Method);
                 IL.Emit(OpCodes.Newobj,
-                    f.Delegate.GetTypeInfo().GetConstructors().First());
-                IL.Emit(OpCodes.Stsfld, (FieldInfo)f.AditionnalInfo);
-                IL.Emit(OpCodes.Ldsfld, (FieldInfo)f.AditionnalInfo);
+                    ((AssemblyFunction)f.Information).DelegateType.GetTypeInfo().GetConstructors().First());
+                IL.Emit(OpCodes.Stsfld, ((AssemblyFunction)f.Information).DelegateField);
+                IL.Emit(OpCodes.Ldsfld, ((AssemblyFunction)f.Information).DelegateField);
                 IL.EmitCall(OpCodes.Call, FReg, null);
             }
             IL.Emit(OpCodes.Ret);

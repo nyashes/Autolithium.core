@@ -46,6 +46,7 @@ namespace Autolithium.core
         {
             if (!INTERCATIVE)
             {
+                var snap = ExpressionTypeBeam.TakeSnapshot();
                 var @break = Expression.Label("break");
                 var @continue = Expression.Label("continue");
                 Contextual.Push(Expression.Goto(@break));
@@ -62,6 +63,7 @@ namespace Autolithium.core
                 //VarSynchronisation.Clear();
                 Instruction.Add(Expression.IfThen(Cond, Expression.Goto(@continue)));
                 Instruction.Add(Expression.Label(@break));
+                Instruction.Add(ExpressionTypeBeam.RestoreSnapshot(snap));
                 Contextual.Pop();
                 Contextual.Pop();
                 return Expression.Block(Instruction.ToArray());

@@ -43,19 +43,22 @@ namespace Autolithium.core
 {
     public partial class LiParser
     {
-        public List<Expression> DefineGlobal()
+        public void DefineGlobal()
         {
             var Matches = Script.Where(x => Regex.IsMatch(x, "^(?:\t| )*(global(?:.*?))$", RegexOptions.IgnoreCase)).ToList();
             var Lines = Matches.Select(x => Array.IndexOf(Script, x));
-            List<Expression> Ret = new List<Expression>();
+            //List<Expression> Ret = new List<Expression>();
             foreach (var L in Lines)
             {
                 this.GotoLine(L);
                 ConsumeWS();
                 if (Read(6).ToUpper() != "GLOBAL") throw new Exception("WHAT'S THE FU.U.U..U.U ....");
-                Ret.Add(ParseKeyword_GLOBAL("GLOBAL"));
+                ConsumeWS();
+                if (Read() != "$") throw new AutoitException(AutoitExceptionType.EXPECTVAR, L, Cursor);
+                ExpressionTypeBeam.CurrentScope.DeclareVar(Getstr(Reg_AlphaNum), typeof(object));
+                //Ret.Add(ParseKeyword_GLOBAL("GLOBAL"));
             }
-            return Ret;
+            //return Ret;
         }
     }
 }

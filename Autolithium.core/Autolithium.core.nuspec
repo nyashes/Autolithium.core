@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Autolithium.core</id>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <authors>Alexandre THOUVENIN</authors>
     <description>An autoit-like compiler https://github.com/nem-e5i5/Autolithium.core</description>
     <summary>Autolithium.core contains an autoit-like .NET 4.5/Windows phone 8/Windows store compiler that can be extended to compile a script to a .NET assembly or to a script host to extend your application, see Autolithium.compiler and Autolithium.host for more informations about that</summary>

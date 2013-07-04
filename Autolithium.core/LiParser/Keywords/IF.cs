@@ -52,32 +52,38 @@ namespace Autolithium.core
                 ConsumeWS();
                 if (!EOL)
                 {
+                    ExpressionTypeBeam.PushBlockScope();
                     var Exp = ParseBoolean();
+                    Exp = Expression.Block(ExpressionTypeBeam.PopScope(), Exp);
                     NextLine(); ConsumeWS();
                     if (Peek(6).ToUpper() == "ELSEIF") { Consume(6); return Expression.IfThenElse(Element, Exp, ParseKeyword_IF(Keyword)); }
-                    else if (Peek(4).ToUpper() == "ELSE") { Consume(4); return Expression.IfThenElse(Element, Exp, ParseBoolean()); }
+                    else if (Peek(4).ToUpper() == "ELSE")
+                    {
+                        Consume(4);
+                        ExpressionTypeBeam.PushBlockScope();
+                        var e2 = ParseBoolean();
+                        return Expression.IfThenElse(Element, Exp, Expression.Block(ExpressionTypeBeam.PopScope(), e2));
+                    }
                     else { NextLine(-1); return Expression.IfThen(Element, Exp); }
                 }
                 else if (!INTERCATIVE)
                 {
                     Expression Condition = Element;
-                    List<Expression> Instruction = new List<Expression>();
-                    Instruction.AddRange(ParseBlock());
+                    Expression Instruction = ParseBlock();
                     Seek();
                     ConsumeWS();
                     var s = Getstr(Reg_AlphaNum).ToUpper();
                     switch (s)
                     {
                         case "ELSE":
-                            List<Expression> Otherwise = new List<Expression>();
-                            Otherwise.AddRange(ParseBlock());
+                            Expression Otherwise = ParseBlock();
                             Seek();
                             ConsumeWS();
-                            return Expression.IfThenElse(Condition, Expression.Block(Instruction.ToArray()), Expression.Block(Otherwise.ToArray()));
+                            return Expression.IfThenElse(Condition, Instruction, Otherwise);
                         case "ELSEIF":
-                            return Expression.IfThenElse(Condition, Expression.Block(Instruction.ToArray()), ParseKeywordOrFunc("IF"));
+                            return Expression.IfThenElse(Condition, Instruction, ParseKeywordOrFunc("IF"));
                         default:
-                            return Expression.IfThen(Condition, Expression.Block(Instruction.ToArray()));
+                            return Expression.IfThen(Condition, Instruction);
                     }
                 }
                 else throw new AutoitException(AutoitExceptionType.MULTILINEININTERACTIVE, LineNumber, Cursor, Keyword);

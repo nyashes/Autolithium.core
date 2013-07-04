@@ -44,17 +44,17 @@ namespace Autolithium.compiler
 {
     public static class GenerateMultiCastDelegate
     {
-        public static Type CreateDelegateFor(this ModuleBuilder ASM, FunctionDefinition F)
+        public static Type CreateDelegateFor(this ModuleBuilder ASM, string TypeName, Type Return, IEnumerable<Type> Arguments)
         {
-            var typeBuilder = ASM.DefineType("&=" + F.MyName, TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass, typeof(System.MulticastDelegate));
+            var typeBuilder = ASM.DefineType("&=" + TypeName, TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.AnsiClass | TypeAttributes.AutoClass, typeof(System.MulticastDelegate));
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.RTSpecialName | MethodAttributes.HideBySig | MethodAttributes.Public, CallingConventions.Standard, new Type[] { typeof(object), typeof(System.IntPtr) });
             constructorBuilder.SetImplementationFlags(MethodImplAttributes.Runtime | MethodImplAttributes.Managed);
 
             // Grab the parameters of the method
-            Type[] paramTypes = F.MyArguments.Select(x => x.MyType).ToArray();
+            Type[] paramTypes = Arguments.ToArray();
 
             // Define the Invoke method for the delegate
-            var methodBuilder = typeBuilder.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual, F.ReturnType, paramTypes);
+            var methodBuilder = typeBuilder.DefineMethod("Invoke", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual, Return, paramTypes);
             methodBuilder.SetImplementationFlags(MethodImplAttributes.Runtime | MethodImplAttributes.Managed);
 
             // bake it!

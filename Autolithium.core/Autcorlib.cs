@@ -38,6 +38,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Autolithium.core
@@ -204,7 +205,7 @@ namespace Autolithium.core
         }
         public static bool STRINGISSPACE(string s)
         {
-            throw new NotImplementedException();
+            return s.ToCharArray().All(x => (x <= 13 && x >= 9) || x == 32);
         }
         public static bool STRINGISUPPER(string s)
         {
@@ -212,7 +213,23 @@ namespace Autolithium.core
         }
         public static bool STRINGISXDIGIT(string s)
         {
-            throw new NotImplementedException();
+            return s.ToUpper().ToCharArray().All(x => (x <= 'F' && x >= 'A') || (x <= '0' && x >= '9'));
+        }
+        public static bool STRINGISXDIGIT(int s)
+        {
+            return true;
+        }
+        public static bool STRINGISXDIGIT(long s)
+        {
+            return true;
+        }
+        public static bool STRINGISXDIGIT(double s)
+        {
+            return true;
+        }
+        public static bool STRINGISXDIGIT(bool s)
+        {
+            return true;
         }
         public static string STRINGLEFT(string s, int count)
         {
@@ -226,17 +243,22 @@ namespace Autolithium.core
         {
             return s.ToLower();
         }
-        public static string STRINGMID(string s)
+        public static string STRINGMID(string s, int start, int? count)
         {
-            throw new NotImplementedException();
+            return count == null ? s.Substring(start) : s.Substring(start, (int)count);
         }
-        public static object STRINGREGEXP(string str, string Patern, int Option)
+        public static bool STRINGREGEXPISMATCH(string str, string Pattern, bool? casesense, int? offset)
         {
-            throw new NotImplementedException();
+            return Regex.IsMatch(str.Substring((offset ?? 1) - 1), Pattern);
         }
-        public static string STRINGREGEXPREPLACE(string str, string Patern, int Option)
+        public static string[] STRINGREGEXPMATCHES(string str, string Pattern, bool? casesense, int? offset)
         {
-            throw new NotImplementedException();
+            return Enumerable.Select<Match, string>(
+                Regex.Matches(str.Substring((offset ?? 1) - 1), Pattern).Cast<Match>(), x => x.Value).ToArray();
+        }
+        public static string STRINGREGEXPREPLACE(string str, string Pattern, string Replace, bool? casesense)
+        {
+            return Regex.Replace(str, Pattern, Replace, casesense ?? false ? RegexOptions.IgnoreCase : RegexOptions.None);
         }
         public static string STRINGREPLACE(string Source, string From, string To)
         {
@@ -253,7 +275,7 @@ namespace Autolithium.core
         }
         public static string STRINGSTRIPCR(string s)
         {
-            throw new NotImplementedException();
+            return s.Replace("\r", "");
         }
         public static string STRINGSTRIPWS(string s)
         {
@@ -263,9 +285,11 @@ namespace Autolithium.core
         {
             return s.ToCharArray().Cast<string>().ToArray();
         }
-        public static string STRINGTOBINARY(string s)
+        public static byte[] STRINGTOBINARY(string s, string EncodingName)
         {
-            throw new NotImplementedException();
+            EncodingName = EncodingName ?? "ANSI";
+            return Encoding.GetEncoding(EncodingName).GetBytes(s);
+
         }
         public static string STRINGTRIMLEFT(string s, int count)
         {

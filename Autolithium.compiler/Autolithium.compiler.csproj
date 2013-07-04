@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASMInclude.cs" />
+    <Compile Include="AssemblyScope.cs" />
     <Compile Include="Compile.cs" />
     <Compile Include="GenerateMultiCastDelegate.cs" />
     <Compile Include="Program.cs" />

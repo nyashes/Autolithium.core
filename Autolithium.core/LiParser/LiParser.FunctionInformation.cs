@@ -47,15 +47,4 @@ namespace Autolithium.core
         public bool IsByRef = false;
         public Expression DefaultValue = Expression.Constant(null);
     }
-    public class FunctionDefinition
-    {
-        public int DefinitionSignature;
-        public string MyName;
-        public Type ReturnType = typeof(object);
-        public List<ArgumentDefinition> MyArguments = new List<ArgumentDefinition>();
-        public MethodInfo Body;
-        public Type Delegate;
-        public Expression DelegateAccess;
-        public object AditionnalInfo;
-    }
 }

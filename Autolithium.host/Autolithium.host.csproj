@@ -40,6 +40,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HostScope.cs" />
     <Compile Include="Host.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

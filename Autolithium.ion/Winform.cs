@@ -36,11 +36,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Autolithium
 {
     public static class Winform
     {
+        public static int MSGBOX(int flag, string Title, string Content)
+        {
+            MessageBoxButtons Button = MessageBoxButtons.OK;
+            MessageBoxIcon Icon = MessageBoxIcon.None;
+            MessageBoxDefaultButton Default = MessageBoxDefaultButton.Button1;
+            switch (flag & 0xF)
+            {
+                case 0x0: Button = MessageBoxButtons.OK; break;
+                case 0x1: Button = MessageBoxButtons.OKCancel; break;
+                case 0x2: Button = MessageBoxButtons.AbortRetryIgnore; break;
+                case 0x3: Button = MessageBoxButtons.YesNoCancel; break;
+                case 0x4: Button = MessageBoxButtons.YesNo; break;
+                case 0x5: Button = MessageBoxButtons.RetryCancel; break;
+                case 0x6: throw new NotImplementedException("Cannot use flag 6 for MsgBox sry"); break;
+            }
+            switch (flag & 0xF0)
+            {
+                case 0x00: Icon = MessageBoxIcon.None; break;
+                case 0x10: Icon = MessageBoxIcon.Stop; break;
+                case 0x20: Icon = MessageBoxIcon.Question; break;
+                case 0x30: Icon = MessageBoxIcon.Exclamation; break;
+                case 0x40: Icon = MessageBoxIcon.Information; break;
+            }
+            switch (flag & 0xF00)
+            {
+                case 0x000: Default = MessageBoxDefaultButton.Button1; break;
+                case 0x100: Default = MessageBoxDefaultButton.Button2; break;
+                case 0x200: Default = MessageBoxDefaultButton.Button3; break;
+            }
+            var Res = MessageBox.Show(Content, Title, Button, Icon, Default);
+            return (int)Res;
+        }
         public static void ALERT(string Msg)
         {
             System.Windows.Forms.MessageBox.Show(Msg);

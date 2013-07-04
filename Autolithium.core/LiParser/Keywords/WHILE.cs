@@ -45,6 +45,7 @@ namespace Autolithium.core
         private Expression ParseKeyword_WHILE(string Keyword)
         {
             var Element = ParseBoolean(false).ConvertTo(typeof(bool));
+            var snap = ExpressionTypeBeam.TakeSnapshot();
             ConsumeWS();
             if (!EOL)
             {
@@ -69,6 +70,7 @@ namespace Autolithium.core
                 Instruction.AddRange(ParseBlock(true));
                 Instruction.Add(Expression.Goto(@continue));
                 Instruction.Add(Expression.Label(@break));
+                Instruction.Add(ExpressionTypeBeam.RestoreSnapshot(snap));
                 Contextual.Pop();
                 Contextual.Pop();
                 return Expression.Block(Instruction.ToArray());
